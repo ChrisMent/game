@@ -1,14 +1,12 @@
 class WorldObject{
     character = new Character();
     
-    enemies = level1.enemies
-    clouds = level1.clouds
-    backgroundImages = level1.backgroundImage
-
+    level = level1
     canvas;
     ctx;
     keyboard;
     camera_x = 0
+
     
 
 
@@ -20,12 +18,27 @@ class WorldObject{
         this.character = new Character(this); 
         this.setWorld();
         this.draw();
+        this.checkCollisions()
+
+    }
+
+    checkCollisions(){
+        setInterval(() => {
+            this.level.enemies.forEach((enemy) => {
+                if(this.character.isColliding(enemy)){
+                    //console.log('Collision with character :', enemy)
+                    this.character.hit()
+                    console.log('Collision energy: ', this.character.energy)
+                }
+            })
+
+        }, 200)
 
     }
 
     setWorld(){
-    this.character.world = this
-    this.character.animate();
+        this.character.world = this
+        this.character.animate();
     }
 
     draw(){
@@ -33,9 +46,9 @@ class WorldObject{
        
         this.ctx.translate(this.camera_x, 0)
 
-        this.addObjectsToMap(this.backgroundImages);
-        this.addObjectsToMap(this.clouds);
-        this.addObjectsToMap(this.enemies)
+        this.addObjectsToMap(this.level.backgroundObjects);
+        this.addObjectsToMap(this.level.clouds);
+        this.addObjectsToMap(this.level.enemies)
         this.addToMap(this.character)
 
         this.ctx.translate(-this.camera_x, 0)
@@ -56,15 +69,27 @@ class WorldObject{
     // Hinzufügen zum Canvas-Fenster
     addToMap(object){
         if(object.otherDirection) {
-            this.ctx.save()
-            this.ctx.translate(object.width, 0)
-            this.ctx.scale(-1,1)
-            object.x = object.x * - 1
+            this.flipImage(object)
         }
-        this.ctx.drawImage(object.img, object.x, object.y, object.width, object.height)
+        object.draw(this.ctx)
+        object.drawRect(this.ctx)
+        
         if(object.otherDirection){
-            object.x = object.x * - 1
-            this.ctx.restore()
+            this.flipImageRestore(object)
         }
+    }
+
+    flipImage(object){
+        this.ctx.save()
+        this.ctx.translate(object.width, 0)
+        this.ctx.scale(-1,1)
+        object.x = object.x * - 1
+
+    }
+
+    flipImageRestore(object){
+        object.x = object.x * - 1
+        this.ctx.restore()
+
     }
 }
