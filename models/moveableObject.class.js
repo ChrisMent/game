@@ -1,63 +1,54 @@
-class MoveableObject{
-    x = 120;
-    y = 250;
-    img;
-    height = 150;
-    width = 100;
-    ImgStorage = {};
-    currentImage = 0
+class MoveableObject extends DrawableObject{
     speed = 0.15
     otherDirection = false
     speedY = 0
     acceleration = 2
     energy = 100
-    
+    lastHit = 0
+    hasJustLanded = false; // Flag, um zu überwachen, ob der Charakter gerade gelandet ist
+    inAir = false; // Neue Eigenschaft, um zu verfolgen, ob das Objekt in der Luft ist
 
 
     // Methoden
 
-    loadImage(path) { // loadImage('img/test.png')
-        this.img = new Image(); // Nichts anderes als Zugriff im DOM this.img = document.getElementById('image') <img id="image" src...>
-        this.img.src = path;
-        //console.log("Bild geladen:", path);
-    }
-
-    /**
-     * 
-     * @param {Array} arr - ['game/img/1.png', 'game/img/2.png', ...] 
-     */
-    loadImages(arr){
-        arr.forEach((path) => {
-            let img = new Image()
-            img.src = path;
-            this.ImgStorage[path] = img
-    })
-    }
-
     applyGravity() {
         setInterval(() => {
             if (this.isAboveGround() || this.speedY > 0) {
+                this.inAir = true; // Der Charakter ist in der Luft
                 this.y -= this.speedY;
                 this.speedY -= this.acceleration;
             } else {
-                this.speedY = 0; // Charakter hat den Boden erreicht
-                this.isJumping = false;
-                this.showLandingImage();
+                if (this.inAir) {
+                    this.inAir = false; // Der Charakter hat den Boden erreicht
+                    if (!this.hasJustLanded) {
+                        this.showLandingImage(); // Zeigen Sie das Landungsbild an
+                        this.hasJustLanded = true; // Setzen Sie das Flag, da der Charakter gerade gelandet ist
+                    }
+                } else {
+                    this.hasJustLanded = false; // Reset, wenn der Charakter am Boden ist und nicht springt
+                }
+                this.speedY = 0;
             }
         }, 1000 / 45);
     }
 
     showLandingImage() {
-        if (!this.isAboveGround()) {
-            let landingImagePath = this.IMAGES_JUMPING[8];
-            this.img = this.ImgStorage[landingImagePath];
-        }
+        let landingImagePath = this.IMAGES_JUMPING[8];
+        this.img = this.ImgStorage[landingImagePath];
     }
 
     isAboveGround(){
-        //console.log('this.y: ', this.y)
-        return this.y < 160
+        // console.log('this.y: ', this.y)
+        // -----------------
+        /* Gibt "true" zurück wenn der Character über 160 auf der Y - Achse ist
+           Das ist immer der Fall wenn der Character springt, da 160 ist die
+           Grundlinie ist */
         
+        if(this instanceof throwAbleObject){
+            return true
+        } else {
+        return this.y < 160 
+        }
     }
 
     moveLeft(){
@@ -87,29 +78,6 @@ class MoveableObject{
         this.currentImage++;
     }
 
-    draw(ctx){
-        ctx.drawImage(this.img, this.x, this.y, this.width, this.height)
-
-    }
-
-    drawRect(ctx){
-        if(this instanceof Character){
-        ctx.beginPath();
-        ctx.lineWidth = "2";
-        ctx.strokeStyle = "blue";
-        ctx.rect(this.x, this.y, this.width, this.height);
-        ctx.stroke();
-        }
-
-        if(this instanceof Chicken){
-            ctx.beginPath();
-            ctx.lineWidth = "2";
-            ctx.strokeStyle = "blue";
-            ctx.rect(this.x, this.y, this.width, this.height);
-            ctx.stroke();
-            }
-    }
-
     isColliding(obj) {
         return  this.x + this.width > obj.x &&
                 this.y + this.height > obj.y &&
@@ -122,13 +90,21 @@ class MoveableObject{
         this.energy -= 5
         if(this.energy < 0) {
             this.energy = 0
+        } else {
+            this.lastHit = new Date().getTime()
         }
-        console.log('Collision energy: ', this.energy)
+        // console.log('Collision energy: ', this.energy)
     }
 
     isDeath(){
-        return this.energy == 0 // Gibt true OR fals zurück
+        return this.energy == 0 // Gibt true OR false zurück
 
+    }
+
+    isHurt(){
+        let timePassed = new Date().getTime() - this.lastHit // Differenz in ms
+        timePassed = timePassed / 1000 // Berechnung der Differrenz in s
+        return timePassed < 0.125 // Gibt true OR false zurück
     }
 
 }

@@ -4,7 +4,7 @@ class Character extends MoveableObject {
     y = 160
     height = 280
     speed = 4
-    isJumping = false;
+     
     IMAGES_WALKING = [
         '../game/img/2_character_pepe/2_walk/W-21.png',
         '../game/img/2_character_pepe/2_walk/W-22.png',
@@ -82,6 +82,7 @@ class Character extends MoveableObject {
         this.loadImages(this.IMAGES_WALKING)
         this.loadImages(this.IMAGES_JUMPING)
         this.loadImages(this.IMAGES_DEATH)
+        this.loadImages(this.IMAGES_HURT)
         this.world = world;
         this.applyGravity()
         
@@ -90,7 +91,7 @@ class Character extends MoveableObject {
     
     animate() {  
         setInterval(() => {
-            // Bewegen des Characters 
+            // Bewegen des Characters
             this.walking_sound.pause()
             if (this.world.keyboard.moveRight && this.x < this.world.level.level_end_x) {
                 this.moveRight()
@@ -103,25 +104,31 @@ class Character extends MoveableObject {
                 this.otherDirection = true
             } else if(this.world.keyboard.pushSpace && !this.isAboveGround() ){
                 this.jump()
+                
             }
 
             this.world.camera_x = -this.x + 100
-        }, 10);
+        }, 1000 / 60);
         
         setInterval(() => {
-            // Bewegungsanimation
+            // Bewegungen animieren
             if(this.isDeath()){
                 this.playAnimation(this.IMAGES_DEATH)
+            } 
+            else if (this.isHurt()) {
+                this.playAnimation(this.IMAGES_HURT)
             }
+            // Wenn der Character in der Luft ist, dann spiele die Sprunganimation ab
             else if (this.isAboveGround()){
                 this.playAnimation(this.IMAGES_JUMPING)
-
-            } else {
+            } 
+            
+            else {
                 if (this.world.keyboard.moveRight || this.world.keyboard.moveLeft) {
                 this.playAnimation(this.IMAGES_WALKING); 
             }}
 
-        }, 1);
+        }, 125);
 
 
     }

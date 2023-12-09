@@ -1,12 +1,19 @@
-class WorldObject{
-    character = new Character();
+class WorldObject {
+    character = new Character()
     
+    statusbars = {
+        life: new Statusbar(10, 0, 200, 60, 'life'), /* Parameter für Lebenspunkte */
+        bottle: new Statusbar(10, 70, 200, 60, 'bottle') /* Parameter für gesammelte Flaschen */
+    };
+    
+    
+    bottles = []
     level = level1
     canvas;
-    ctx;
+  
     keyboard;
     camera_x = 0
-
+    
     
 
 
@@ -18,22 +25,37 @@ class WorldObject{
         this.character = new Character(this); 
         this.setWorld();
         this.draw();
-        this.checkCollisions()
+        this.run()
 
     }
 
-    checkCollisions(){
+
+    run(){
         setInterval(() => {
+            this.checkCollisions()
+            this.checkThrowObject()
+        },200)
+
+    }
+
+    checkThrowObject(){
+        if(this.keyboard.throwBottle){
+            let bottle = new throwAbleObject(this.character.x + 40, this.character.y + 100)
+            this.bottles.push(bottle)
+
+        }
+
+    }
+
+    checkCollisions() {
             this.level.enemies.forEach((enemy) => {
-                if(this.character.isColliding(enemy)){
-                    //console.log('Collision with character :', enemy)
-                    this.character.hit()
-                    console.log('Collision energy: ', this.character.energy)
+                if (this.character.isColliding(enemy)) {
+                    this.character.hit();
+                    // Aktualisieren der Lebenspunkte-Statusleiste
+                    this.statusbars.life.setPercentage(this.character.energy);
+                    //console.log('Collision energy: ', this.character.energy);
                 }
-            })
-
-        }, 200)
-
+            });
     }
 
     setWorld(){
@@ -41,22 +63,33 @@ class WorldObject{
         this.character.animate();
     }
 
-    draw(){
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-       
-        this.ctx.translate(this.camera_x, 0)
+    draw() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.translate(this.camera_x, 0);
 
+        // Zeichnen der Hintergrundobjekte
         this.addObjectsToMap(this.level.backgroundObjects);
+
+        this.ctx.translate(-this.camera_x, 0); // Zurücksetzen der Translation für fixe Objekte
+
+        // Zeichnen der Statusleisten
+        this.addToMap(this.statusbars.life);
+        //this.addToMap(this.statusbars.bottle);
+
+        this.ctx.translate(this.camera_x, 0); // Wiederanwenden der Translation für bewegliche Objekte
+
+        // Zeichnen des Charakters und anderer beweglicher Objekte
+        this.addToMap(this.character);
+
         this.addObjectsToMap(this.level.clouds);
-        this.addObjectsToMap(this.level.enemies)
-        this.addToMap(this.character)
+        this.addObjectsToMap(this.level.enemies);
+        this.addObjectsToMap(this.bottles);
 
-        this.ctx.translate(-this.camera_x, 0)
+        this.ctx.translate(-this.camera_x, 0); // Zurücksetzen der Translation
 
-
-        // draw() wird immer wieder neu gemalt
-        let self = this
-        requestAnimationFrame(function(){
+        // Anforderung des nächsten Zeichenrahmens
+        let self = this;
+        requestAnimationFrame(function() {
             self.draw();
         });
     }
