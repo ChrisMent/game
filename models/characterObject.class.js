@@ -1,9 +1,21 @@
 class Character extends MoveableObject {
     world;
-    x = 0
-    y = 160
+    x = 0 // Position: this.world.camera_x = -this.x + 100
+    y = 150
     height = 280
+    width = 100
     speed = 4
+    lastX = 0;
+    lastActionTime = 0;
+    bottlesCollected = 0;
+    coinsCollected = 0;
+    lives = 5;
+    lastHit = 0
+    hasJustLanded = false; // Flag, um zu überwachen, ob der Charakter gerade gelandet ist
+    inAir = false; // Neue Eigenschaft, um zu verfolgen, ob das Objekt in der Luft ist
+    invulnerabilityDuration = 1000; 
+
+    
      
     IMAGES_WALKING = [
         '../game/img/2_character_pepe/2_walk/W-21.png',
@@ -73,9 +85,12 @@ class Character extends MoveableObject {
 
     ]
 
-
-
     walking_sound = new Audio('../game/audio/walking.mp3')
+    hurt_sound = new Audio('../game/audio/pain.mp3')
+    die_sound = new Audio('../game/audio/die.mp3')
+    jump_sound = new Audio('../game/audio/jump.mp3')
+    collect_bottle_sound = new Audio('../game/audio/bottle_collect.mp3')
+    collect_coin_sound = new Audio('../game/audio/coin.mp3')
 
     constructor(world){
         super().loadImage('../game/img/2_character_pepe/2_walk/W-21.png')
@@ -83,13 +98,17 @@ class Character extends MoveableObject {
         this.loadImages(this.IMAGES_JUMPING)
         this.loadImages(this.IMAGES_DEATH)
         this.loadImages(this.IMAGES_HURT)
-        this.world = world;
+        this.loadImages(this.IMAGES_IDLE)
+        this.loadImages(this.IMAGES_LONG_IDLE)
+        this.world = world
+        this.lastX = this.x
+        this.lastActionTime = new Date().getTime()
         this.applyGravity()
         
-        
     }
-    
+
     animate() {  
+        
         setInterval(() => {
             // Bewegen des Characters
             this.walking_sound.pause()
@@ -104,19 +123,30 @@ class Character extends MoveableObject {
                 this.otherDirection = true
             } else if(this.world.keyboard.pushSpace && !this.isAboveGround() ){
                 this.jump()
+                this.jump_sound.play()
                 
-            }
+            } 
 
             this.world.camera_x = -this.x + 100
         }, 1000 / 60);
         
         setInterval(() => {
             // Bewegungen animieren
-            if(this.isDeath()){
+            let idleTime = this.isIdle();
+            if (idleTime > 2 && idleTime < 15) {
+                // Wenn der Charakter zwischen 2 und 15 Sekunden inaktiv ist
+                this.playAnimation(this.IMAGES_IDLE);
+            } else if (idleTime >= 15) {
+                // Wenn der Charakter für 15 oder mehr Sekunden inaktiv ist
+                this.playAnimation(this.IMAGES_LONG_IDLE);
+            }
+            else if(this.isDeath()){
                 this.playAnimation(this.IMAGES_DEATH)
+                this.die_sound.play()
             } 
             else if (this.isHurt()) {
                 this.playAnimation(this.IMAGES_HURT)
+                this.hurt_sound.play()
             }
             // Wenn der Character in der Luft ist, dann spiele die Sprunganimation ab
             else if (this.isAboveGround()){
@@ -132,7 +162,41 @@ class Character extends MoveableObject {
 
 
     }
-    
 
+    loseLife() {
+        if (this.lives > 0) {
+            this.lives--;
+            //console.log('Leben verloren. Verbleibende Leben:', this.lives);
+        }
+        if (this.lives === 0) {
+            //console.log('Character ist gestorben.');
+            // Hier könnten Sie eine Logik für das Spielende implementieren.
+        }
+    }
+
+    hit() {
+        let currentTime = new Date().getTime();
+        if (currentTime - this.lastHit > this.invulnerabilityDuration) {
+            this.lives--;
+            this.lastHit = currentTime;
+            // Weitere Logik bei Treffer, z.B. Abspielen eines Sounds
+        }
+    }
+
+    isDeath() {
+        return this.lives <= 0;
+    }
+
+    isHurt(){
+        let timePassed = new Date().getTime() - this.lastHit // Differenz in ms
+        timePassed = timePassed / 1000 // Berechnung der Differrenz in s
+        return timePassed < 0.125 // Gibt true OR false zurück
+    }
+
+    isIdle() {
+        let currentTime = new Date().getTime();
+        let timeElapsed = (currentTime - this.lastActionTime) / 1000; // Zeit in Sekunden
+        return timeElapsed;
+    }
 
 }
