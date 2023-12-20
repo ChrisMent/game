@@ -15,7 +15,6 @@ class WorldObject {
         this.level = level;  // Jetzt weisen Sie das übergebene level-Objekt zu
         this.groundBottles = level.groundBottles;
         this.groundCoins = level.coins;
-        console.log('level.coins', level.coins)
         this.character = new Character(this); 
         this.statusbars = {
             life: new Statusbar(15, 0, 75, 75, 'life', 0, this.ctx),

@@ -54,8 +54,7 @@ class MoveableObject extends DrawableObject{
         this.lastX = this.x
         this.lastActionTime = new Date().getTime()
         //console.log(`Character x after moving right: ${this.x}`)
-        
-        
+          
     }
 
     jump(){
