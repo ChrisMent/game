@@ -15,8 +15,12 @@ class WorldObject {
         this.level = level;  // Jetzt weisen Sie das übergebene level-Objekt zu
         this.groundBottles = level.groundBottles;
         this.groundCoins = level.coins;
-        console.log('level.coins', level.coins)
         this.character = new Character(this); 
+        this.setWorld();
+        // console.log("Character initialisiert:", this.character);
+        this.endboss = new Endboss(this);
+        this.level.enemies.push(this.endboss);
+        // console.log("Endboss initialisiert:", this.endboss);
         this.statusbars = {
             life: new Statusbar(15, 0, 75, 75, 'life', 0, this.ctx),
             bottle: new Statusbar(110, 10, 63, 63, 'bottle', 0, this.ctx),
@@ -27,7 +31,7 @@ class WorldObject {
         this.clouds.push(new Cloud(0)); // Wolke am Anfang
         this.clouds.push(new Cloud(2400 / 2)); // Wolke in der Mitte
         this.clouds.push(new Cloud(2400 - 350)); // Wolke am Ende
-        this.setWorld();
+        
         this.draw();
         this.run()
 

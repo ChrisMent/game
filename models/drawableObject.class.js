@@ -10,7 +10,7 @@ class DrawableObject {
     loadImage(path) {
         this.img = new Image();
         this.img.onload = () => {
-            console.log("Bild geladen:", path);
+            // console.log("Bild geladen:", path);
             this.imageLoaded = true; // Diese Zeile ist optional, da img.complete verwendet werden kann
         };
         this.img.onerror = () => {
@@ -39,9 +39,9 @@ class DrawableObject {
     
 
     draw(ctx) {
-        if (this.img.complete && this.img.naturalWidth !== 0) {
+        if (this.img && this.img.complete && this.img.naturalWidth !== 0) {
             ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
-        } 
+        }
     }
     
 

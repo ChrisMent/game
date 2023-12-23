@@ -25,7 +25,7 @@ const chickens = Array.from({ length: 1 }, () => new Chicken());
 
 const groundBottles = Array.from({ length: 5 }, (_, index) => new Bottle(300 + (Math.random() * 100 + 200 ) * index))
 
-const enemies = [...chickens, new Endboss()];
+const enemies = [...chickens];
 const clouds = [new Cloud()];
 const backgroundObjects = [
     new BackgroundImage('../game/img/5_background/layers/air.png', 719 * -1),
