@@ -1,7 +1,13 @@
+@font-face {
+  font-family: "rio-grande";
+  src: url("fonts/rio-grande/RioGrande.ttf") format("truetype");
+}
+
 body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   background-image: url("/game/img/10_backgrounds/desert-5_1920.png");
   background-position: center;
   background-repeat: no-repeat;
@@ -14,19 +20,27 @@ body {
   font-family: "rio-grande", Helvetica, sans-serif;
 }
 
-@font-face {
-  font-family: "rio-grande";
-  src: url("fonts/rio-grande/RioGrande.ttf") format("truetype");
-}
-
 h1 {
   font-size: 78px;
   letter-spacing: 6px;
   text-align: center;
+  margin-bottom: 80px;
 }
 
 .game-container {
-  position: relative;
+  display: flex;
+  flex-direction: column; /* Änderung hier */
+  justify-content: center;
+  align-items: center;
+  width: 720px;
+  height: 480px;
+}
+
+.game-sizing {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px; /* Optional: Abstand zwischen den Elementen */
 }
 
 canvas {
@@ -37,41 +51,68 @@ canvas {
   box-sizing: border-box;
 }
 
+.button-area-top {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 20px;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
 .button-area-below {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* sorgt dafür, dass die Button-Gruppen auf gegenüberliegenden Seiten sind */
+  align-items: center;
+  flex-grow: 0;
+  flex-shrink: 0;
   width: 100%;
 }
 
-.button-moves-left {
-  position: absolute;
-  top: 87%;
-  left: 13.5%;
-  z-index: 100;
+.buttons-left,
+.buttons-right {
+  display: flex;
+  flex-direction: row; /* vertikale Anordnung der Buttons in jeder Gruppe */
+  justify-content: center;
+  align-items: center;
 }
 
-.button-moves-right {
-  position: absolute;
-  top: 87%;
-  right: 13.5%;
-  z-index: 100;
+.buttons-left .button:last-child,
+.buttons-right .button:last-child {
+  margin-right: 0;
 }
 
-.button-move {
-  text-align: center;
-  max-width: 70px; /* Maximalbreite des Buttons */
-  max-height: 70px; /* Maximalhöhe des Buttons */
+.fullscreen-active .button-area-below {
+  position: absolute;
+  bottom: 0; /* oder einen festen Abstand vom unteren Rand, wenn nötig */
+  left: 50%;
+  transform: translateX(-50%); /* Zentriert die button-area-below horizontal */
+  width: 720px; /* Breite entsprechend der ursprünglichen Größe des game-container */
+  height: 480px;
+}
+
+.game-interaction {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  background-color: #2b1800;
+  border: solid 2px #ffe5c4;
+  border-radius: 20px;
 }
 
 .material-symbols-outlined {
-  font-size: 2.6vw; /* Skaliert mit der Breite des Viewports */
+  font-size: 24px; /* Skaliert mit der Breite des Viewports */
 }
 
 .button {
   position: relative;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   margin: 10px;
   font-size: 1rem;
+  z-index: 100;
 }
 
 .button a {
@@ -123,20 +164,10 @@ canvas {
   border-radius: 5px;
 }
 
-.button-area-top {
-  position: absolute;
-  bottom: 30%;
-  z-index: 100;
-  display: flex;
-  left: 3%;
-  background-color: #2b1800;
-  border: solid 2px #ffe5c4;
-  border-radius: 20px;
-  flex-direction: column;
-}
-
 .button-game-action {
   display: flex;
+  width: 36px; /* Feste Breite */
+  height: 36px; /* Feste Höhe */
   justify-content: center;
   align-items: center;
   appearance: button;
@@ -151,7 +182,6 @@ canvas {
   font-weight: 700;
   letter-spacing: 0.8px;
   line-height: 20px;
-  margin: 0;
   outline: none;
   overflow: visible;
   padding: 4px 7px;
@@ -201,52 +231,89 @@ canvas {
   background: none;
 }
 
+.info-screen {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 1); /* Semi-transparenter Hintergrund */
+  z-index: 2000; /* Stellen Sie sicher, dass es über dem Canvas angezeigt wird */
+  border: solid 8px #1d1c1c;
+
+  box-sizing: border-box;
+  padding: 20px;
+}
+
+.desc-container {
+  color: black;
+}
+
+.desc-image-text {
+  display: flex;
+  align-items: center;
+}
+
+.desc-image-text img {
+  margin-right: 20px;
+}
+
+.close-btn {
+  position: absolute;
+  color: #000;
+  left: 91%;
+  top: 5%;
+}
+
+#close-info {
+  font-size: 2.3rem;
+  text-shadow: 1px 2px 1.5px #000;
+}
+
+.info-screen-content {
+  color: #000;
+}
+
+.info-screen-content h1 {
+  font-size: 3rem;
+  text-align: center;
+  color: #000;
+  padding: 5px;
+  margin: 10px;
+}
+.info-screen-content h3 {
+  color: #000;
+  text-align: center;
+  font-size: 2rem;
+}
+
+.desc-content-align {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
 /* Responsive -------------- */
 
 @media only screen and (max-height: 480px) {
-  canvas {
-    height: 100vh;
+  canvas,
+  .game-container {
+    height: 100vh; /* Volle Höhe des Viewports */
+    max-height: 480px; /* Maximale Höhe */
   }
 }
 
 @media only screen and (max-width: 720px) {
-  canvas {
-    width: 100%;
-  }
-}
-
-@media only screen and (max-width: 530px) {
-  .button-move {
-    margin-right: 5px;
-    margin-bottom: 0px;
-    margin-top: -5px;
+  canvas,
+  .game-container {
+    width: 100%; /* Volle Breite */
+    max-width: 720px; /* Maximale Breite */
   }
 
-  .material-symbols-outlined {
-    font-size: 3vw; /* Größere relative Schriftgröße */
-  }
-}
-
-@media only screen and (max-width: 380px) {
-  .button-moves-right,
-  .button-moves-left {
-    top: 85%;
-  }
-
-  .button a {
-    padding: 0.5px 2px;
-    font-size: 2px;
-  }
-
+  .button-area-below,
   .button-area-top {
-    bottom: 82%;
-  }
-
-  .button-game-action {
-    padding: 4px 7px;
-  }
-
-  .button-move {
-    margin-right: -5px;
+    width: 100%; /* Anpassung der Breite der Button-Container */
+    padding: 0 10px; /* Optional: Padding für kleinere Bildschirme */
   }
 }

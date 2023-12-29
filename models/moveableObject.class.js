@@ -84,6 +84,7 @@ class MoveableObject extends DrawableObject{
         // Überprüfen, ob das Bild geladen und vollständig ist
         if (this.img && this.img.complete) {
             this.currentImage++; // Inkrementiert currentImage für die nächste Animation
+
         } else {
             console.error("Bild nicht geladen oder definiert:", path);
             // Optional: Setzen Sie eine Ersatzlogik hier ein, falls das Bild nicht geladen ist

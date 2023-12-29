@@ -85,12 +85,7 @@ class Character extends MoveableObject {
 
     ]
 
-    walking_sound = new Audio('../game/audio/walking.mp3')
-    hurt_sound = new Audio('../game/audio/pain.mp3')
-    die_sound = new Audio('../game/audio/die.mp3')
-    jump_sound = new Audio('../game/audio/jump.mp3')
-    collect_bottle_sound = new Audio('../game/audio/bottle_collect.mp3')
-    collect_coin_sound = new Audio('../game/audio/coin.mp3')
+ 
 
     constructor(world){
         super().loadImage('../game/img/2_character_pepe/2_walk/W-21.png')
@@ -104,63 +99,68 @@ class Character extends MoveableObject {
         this.lastX = this.x
         this.lastActionTime = new Date().getTime()
         this.applyGravity()
+        this.walking_sound = new Audio('../game/audio/walking.mp3')
+        this.hurt_sound = new Audio('../game/audio/pain.mp3')
+        this.die_sound = new Audio('../game/audio/die.mp3')
+        this.jump_sound = new Audio('../game/audio/jump.mp3')
+        this.collect_bottle_sound = new Audio('../game/audio/bottle_collect.mp3')
+        this.collect_coin_sound = new Audio('../game/audio/coin.mp3')
+        SoundManager.addSound(this.walking_sound);
+        SoundManager.addSound(this.hurt_sound);
+        SoundManager.addSound(this.die_sound);
+        SoundManager.addSound(this.jump_sound);
+        SoundManager.addSound(this.collect_bottle_sound);
+        SoundManager.addSound(this.collect_coin_sound);
+
         
     }
 
-    animate() {  
-        
-        setInterval(() => {
+    animate() {
+        this.movementInterval = setInterval(() => {
+            if (!this.world || !this.world.keyboard) {
+                return; // Verlässt die Funktion, wenn die Welt oder die Tastatur nicht definiert sind
+            }
             // Bewegen des Characters
-            this.walking_sound.pause()
+            this.walking_sound.pause();
             if (this.world.keyboard.moveRight && this.x < this.world.level.level_end_x) {
-                this.moveRight()
-                this.walking_sound.play()
-                this.otherDirection = false
-                
-            } else if(this.world.keyboard.moveLeft && this.x > 0){
-                this.moveLeft()
-                this.walking_sound.play()
-                this.otherDirection = true
-            } else if(this.world.keyboard.pushSpace && !this.isAboveGround() ){
-                this.jump()
-                this.jump_sound.play()
-                
-            } 
-
-            this.world.camera_x = -this.x + 100
+                this.moveRight();
+                this.walking_sound.play();
+                this.otherDirection = false;
+            } else if (this.world.keyboard.moveLeft && this.x > 0) {
+                this.moveLeft();
+                this.walking_sound.play();
+                this.otherDirection = true;
+            } else if (this.world.keyboard.pushSpace && !this.isAboveGround()) {
+                this.jump();
+                this.jump_sound.play();
+            }
+            this.world.camera_x = -this.x + 100;
         }, 1000 / 60);
-        
-        setInterval(() => {
+    
+        this.animationInterval = setInterval(() => {
             // Bewegungen animieren
             let idleTime = this.isIdle();
             if (idleTime > 2 && idleTime < 15) {
-                // Wenn der Charakter zwischen 2 und 15 Sekunden inaktiv ist
                 this.playAnimation(this.IMAGES_IDLE);
             } else if (idleTime >= 15) {
-                // Wenn der Charakter für 15 oder mehr Sekunden inaktiv ist
                 this.playAnimation(this.IMAGES_LONG_IDLE);
+            } else if (this.isDeath()) {
+                this.playAnimation(this.IMAGES_DEATH);
+                this.die_sound.play();
+            } else if (this.isHurt()) {
+                this.playAnimation(this.IMAGES_HURT);
+                this.hurt_sound.play();
+            } else if (this.isAboveGround()) {
+                this.playAnimation(this.IMAGES_JUMPING);
+            } else if (this.world.keyboard.moveRight || this.world.keyboard.moveLeft) {
+                this.playAnimation(this.IMAGES_WALKING);
             }
-            else if(this.isDeath()){
-                this.playAnimation(this.IMAGES_DEATH)
-                this.die_sound.play()
-            } 
-            else if (this.isHurt()) {
-                this.playAnimation(this.IMAGES_HURT)
-                this.hurt_sound.play()
-            }
-            // Wenn der Character in der Luft ist, dann spiele die Sprunganimation ab
-            else if (this.isAboveGround()){
-                this.playAnimation(this.IMAGES_JUMPING)
-            } 
-            
-            else {
-                if (this.world.keyboard.moveRight || this.world.keyboard.moveLeft) {
-                this.playAnimation(this.IMAGES_WALKING); 
-            }}
-
         }, 125);
-
-
+    }
+    
+    stopAnimation() {
+        clearInterval(this.movementInterval);
+        clearInterval(this.animationInterval);
     }
 
     loseLife() {

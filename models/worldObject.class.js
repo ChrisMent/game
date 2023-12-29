@@ -1,4 +1,5 @@
 class WorldObject {
+    infoScreen = new InfoScreen();
     character = new Character()
     bottle = new Bottle() 
     bottles = []
@@ -7,30 +8,46 @@ class WorldObject {
     canvas;
     keyboard;
     camera_x = 0
+    startScreen;
+    gameIsRunning = false; 
 
     constructor(canvas, keyboard, level) {  
         this.ctx = canvas.getContext('2d');
         this.canvas = canvas;
         this.keyboard = keyboard;
-        this.level = level;  // Jetzt weisen Sie das übergebene level-Objekt zu
+        this.startScreen = new StartScreen();
+        this.level = level; 
         this.groundBottles = level.groundBottles;
         this.groundCoins = level.coins;
         this.character = new Character(this); 
         this.setWorld();
-        // console.log("Character initialisiert:", this.character);
         this.endboss = new Endboss(this);
         this.level.enemies.push(this.endboss);
-        // console.log("Endboss initialisiert:", this.endboss);
         this.statusbars = {
             life: new Statusbar(15, 0, 75, 75, 'life', 0, this.ctx),
             bottle: new Statusbar(110, 10, 63, 63, 'bottle', 0, this.ctx),
             coin: new Statusbar(200, 10, 63, 63, 'coin', 0, this.ctx),
             endboss: new Statusbar(640, 15, 63, 63, 'endboss', 0, this.ctx),
         };
-        this.clouds = []; // Initialisiere das Array für die Wolken
+        this.clouds = [];
         this.clouds.push(new Cloud(0)); // Wolke am Anfang
         this.clouds.push(new Cloud(2400 / 2)); // Wolke in der Mitte
         this.clouds.push(new Cloud(2400 - 350)); // Wolke am Ende
+
+        this.endScreenTriggered = false;
+        this.endScreenImage = new Image();
+        this.endScreenImage.src = '../game/img/9_intro_outro_screens/youwin.png';
+        this.endScreenImage.onload = () => {
+             this.endScreenImageLoaded = true;
+
+        }
+
+        //this.gameOverTriggered = false;
+        this.gameOverImage = new Image();
+        this.gameOverImage.src = '../game/img/9_intro_outro_screens/game_over/ohnoyoulost!.png';
+        this.gameOverImage.onload = () => {
+            this.gameOverImageLoaded = true;
+        }
         
         this.draw();
         this.run()
@@ -39,12 +56,81 @@ class WorldObject {
     }
 
     run() {
-        setInterval(() => {
-            this.checkCollisions(); // Prüfe auf Kollisionen mit Feinden.
-            this.checkThrowObject(); // Prüfe, ob der Charakter eine Flasche wirft.
-            this.checkForBottleCollection(); // Prüfe nun auch, ob der Charakter Flaschen sammelt.
-            this.checkForCoinCollection(); // Überprüfe, ob der Charakter Münzen sammelt.
+        this.interval = setInterval(() => {
+            this.checkCollisions();
+            this.checkThrowObject();
+            this.checkForBottleCollection();
+            this.checkForCoinCollection();
+            
+            if (this.endboss.lives <= 0 && !this.endScreenTriggered) {
+                this.showEndScreen();
+            }
+
+            if (this.character.lives <= 0 && !this.gameOverTriggered) {
+                this.gameOver();
+            }
         }, 200);
+    }
+
+    showEndScreen() {
+        
+    // Verzögern Sie das Zeichnen des Endscreens um 3 Sekunden
+        setTimeout(() => {
+            clearInterval(this.interval);
+            this.gameIsRunning = false;
+            this.character.stopAnimation();
+            SoundManager.toggleMute(true);
+        
+            if (this.enemies) {
+                this.enemies.forEach(enemy => enemy.visible = false);
+            }
+            if (this.bottles) {
+                this.bottles.forEach(bottle => bottle.visible = false);
+            }
+            if (this.coins) {
+                this.coins.forEach(coin => coin.visible = false);
+            }
+            this.character.visible = false;
+            this.endScreenTriggered = true;
+            this.drawEndScreen(); // Zeichnen des Endscreens
+        }, 3000);
+    }
+    
+    drawEndScreen() {
+
+        if (this.endScreenTriggered && this.endScreenImageLoaded) {
+            this.ctx.drawImage(this.endScreenImage, 0, 0, this.canvas.width, this.canvas.height);
+        }
+    }
+    
+    gameOver() {
+        this.gameOverTriggered = true;
+        clearInterval(this.interval);
+        this.gameIsRunning = false;
+        this.character.stopAnimation();
+        
+        // Alle Sounds ausschalten
+        SoundManager.toggleMute(true);
+    
+        if (this.enemies) {
+            this.enemies.forEach(enemy => enemy.visible = false);
+        }
+        if (this.bottles) {
+            this.bottles.forEach(bottle => bottle.visible = false);
+        }
+        if (this.coins) {
+            this.coins.forEach(coin => coin.visible = false);
+        }
+        this.character.visible = false;
+        this.drawGameOverScreen();
+    }
+    
+    
+
+    drawGameOverScreen() {
+        if (this.gameOverImageLoaded) {
+            this.ctx.drawImage(this.gameOverImage, 0, 0, this.canvas.width, this.canvas.height);
+        }
     }
 
     checkCollisions() {
@@ -56,8 +142,24 @@ class WorldObject {
                 this.character.hit();
                 this.drawLivesCount();
             }
+    
+            // Überprüfung der Kollision zwischen Flaschen und dem Endboss
+            this.bottles.forEach((bottle, bottleIndex) => {
+                if (bottle.isColliding(enemy) && enemy instanceof Endboss) {
+                    enemy.lives -= 1; // Ein Leben abziehen
+                    this.bottles.splice(bottleIndex, 1); // Flasche entfernen
+    
+                    if (enemy.lives > 0) {
+                        enemy.playHurtAnimation(); // Abspielen der Verletzungsanimation
+                    } else {
+                        enemy.playDeathAnimation();
+                    }
+                }
+            });
         });
     }
+    
+    
       
     jumpOnChicken(enemy) {
         let isJumpingOnChicken = (enemy.constructor === Chicken) &&
@@ -133,11 +235,24 @@ class WorldObject {
         this.character.animate();
     }
 
-
-
     draw() {
+        if (this.gameOverTriggered) {
+            this.drawGameOverScreen();
+            return;
+        }
+
+        if (this.endScreenTriggered) {
+            this.drawEndScreen();
+            return;
+        }
+
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    
+        
+        this.infoScreen.draw(this.ctx);
+
+        if (this.startScreen.isVisible) {
+            this.startScreen.draw(this.ctx);
+        } else {
         // Verschiebe den Canvas basierend auf der Position der Kamera
         this.ctx.save();   // Speichere den aktuellen Canvas-Zustand
         this.ctx.translate(this.camera_x, 0);
@@ -147,6 +262,7 @@ class WorldObject {
 
         // Zeichne alle beweglichen und unbeweglichen Objekte
         this.addBackgroundObjectsToMap();
+
         
         // Zeichne alle Wolken
         this.clouds.forEach(cloud => {
@@ -184,6 +300,7 @@ class WorldObject {
         this.drawCollectedBottlesCount();
         this.drawLivesCount();
         this.drawCollectedCoinsCount()
+    }
     
         // Forderung des nächsten Zeichenrahmens
         requestAnimationFrame(() => this.draw());
@@ -207,11 +324,20 @@ class WorldObject {
 
     drawLivesCount() {
         if (this.statusbars.life.type === 'life') {
+            // Zeichnen der Leben des Characters
             this.ctx.font = "48px rio-grande"; // Schriftart und -größe
             this.ctx.fillStyle = "white"; // Farbe des Textes
             this.ctx.fillText(this.character.lives, this.statusbars.life.x + 70, this.statusbars.life.y + 59.5);
         }
+    
+        // Zeichnen der Leben des Endbosses, wenn die Kamera im entsprechenden Bereich ist
+        if (this.camera_x >= -2200 && this.camera_x <= -1800 && this.statusbars.endboss.type === 'endboss') {
+            this.ctx.fillStyle = "white"; // Andere Farbe für den Endboss
+            this.ctx.fillText(this.endboss.lives, this.statusbars.endboss.x - 25, this.statusbars.endboss.y + 45);
+        }
     }
+    
+    
 
     addBackgroundObjectsToMap() {
         this.addObjectsToMap(this.level.backgroundObjects);
@@ -294,6 +420,18 @@ class WorldObject {
 
         // Stelle den ursprünglichen Zustand des Canvas-Kontexts wieder her
         this.ctx.restore();
+    }
+
+    toggleStartScreen() {
+        if (this.startScreen.isVisible) {
+            this.startScreen.isVisible = false;
+            this.gameIsRunning = true;
+            // Starten oder Fortsetzen des Spiels
+        } else {
+            this.startScreen.isVisible = true;
+            this.gameIsRunning = false;
+            // Pausieren oder Beenden des Spiels
+        }
     }
 
 }

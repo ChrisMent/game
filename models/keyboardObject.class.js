@@ -27,6 +27,12 @@ class KeyboardObject {
             this.throwBottle = false
         }  
     }
+
+    activateButton(buttonId, action) {
+        const button = document.getElementById(buttonId);
+        button.addEventListener('touchstart', () => this[action] = true);
+        button.addEventListener('touchend', () => this[action] = false);
+    }
 }
 
 

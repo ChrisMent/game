@@ -12,18 +12,18 @@ class Chicken extends MoveableObject{
     constructor(){
         super().loadImage('../game/img/3_enemies_chicken/chicken_normal/1_walk/1_w.png')
         this.loadImages(this.IMAGES_WALKING)
+        this.chicken_death_sound = new Audio('../game/audio/chicken-death.mp3')
+        SoundManager.addSound(this.chicken_death_sound);
         // Stellt sicher das Chickens nicht außerhalb der Grenzen von Start 120 und Ende 1800 Pixeln erscheinen
         this.x = 120 + Math.random() * (1800 - 120 - 50);
         this.y = 370
         this.height = 50
         this.width = 50
         this.speed = 0.75 + Math.random() * 0.25
-        
-
         this.animate()
     }
 
-    chicken_death_sound = new Audio('../game/audio/chicken-death.mp3')
+    
 
     animate() {
         this.movingRight = false; // Startet mit einer Bewegung nach rechts
