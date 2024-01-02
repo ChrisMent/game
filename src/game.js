@@ -1,71 +1,76 @@
+// Initialisierung der Variablen
 let canvas;
 let world;
 let keyboard = new KeyboardObject();
 
+// init-Funktion, um das Spiel zu initialisieren
 function init() {
+    // Auswahl des Canvas-Elements
     canvas = document.querySelector('canvas');
-    world = new WorldObject(canvas, keyboard, level1);
+    // Erstellung einer neuen Instanz der Klasse oder des Konstruktors des WorldObject, dem Konstruktur der Klasse werden dabei 3 Parameter übergeben
+    world = new WorldObject(canvas, keyboard, level1); 
 
+    // Aktivieren der Tastatur-Interaktionen für Spielaktionen
     keyboard.activateButton('c_jump', 'pushSpace');
     keyboard.activateButton('c_throw', 'throwBottle');
     keyboard.activateButton('c_left', 'moveLeft');
     keyboard.activateButton('c_right', 'moveRight');
-    //SoundManager.debugSounds();
-    
 
-    // console.log('World: ', world);
-    // console.log('Keyboard:', keyboard);
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-    init();
+function startGame(){
     const startButton = document.getElementById('startButton');
-       
     startButton.addEventListener('click', () => {
-        if (world.gameIsRunning) { // Überprüfen Sie, ob das Spiel läuft
-            world.startScreen.isVisible = true; // Zeigt den Startbildschirm wieder an
-            location.reload(); // Lädt die Seite neu, wenn das Spiel noch nicht gestartet ist
-            world.gameIsRunning = false
+        // Logik zum Starten und Anhalten des Spiels
+        if (world.gameIsRunning) {
+            world.startScreen.isVisible = true;
+            location.reload();
+            world.gameIsRunning = false;
         } else {
-            world.startScreen.isVisible = false; // Versteckt den Startbildschirm
-            world.gameIsRunning = true
-            
+            world.startScreen.isVisible = false;
+            world.gameIsRunning = true;    
         }
-    })
+    });
+
+}
+
+function muteSounds(){
+    // Implementierung der Stummschaltung
     const muteButton = document.getElementById('muteButton');
     const muteIcon = document.getElementById('mute_icon');
     if (muteButton) {
         muteButton.addEventListener('click', () => {
             const isMuted = !SoundManager.sounds[0]?.muted;
             SoundManager.toggleMute(isMuted);
-            if (isMuted) {
-                muteIcon.innerText = 'volume_up'; // Icon ändern, wenn stummgeschaltet
-            } else {
-                muteIcon.innerText = 'volume_off'; // Icon ändern, wenn nicht stummgeschaltet
-            }
+            muteIcon.innerText = isMuted ? 'volume_up' : 'volume_off';
         });
     } 
 
+}
+
+function infoScreen(){
     // Event-Listener für den Info-Button
     const infoButton = document.getElementById('info');
     const infoScreen = document.getElementById('infoScreen');
-    
-    infoScreen.style.display = 'none'; // Initialisieren des display-Stils
-    infoButton.addEventListener('click', () => {
-        infoScreen.style.display = infoScreen.style.display === 'none' ? 'block' : 'none';
-        
-    });
-    const closeInfoScreen = document.getElementById('close-info-screen')
-    closeInfoScreen.addEventListener('click', () => {
-        infoScreen.style.display = 'none';
-        
-    });
 
+    infoScreen.style.display = 'none'; // Anfangszustand des Info-Screens
+    infoButton.addEventListener('click', () => {
+        // Umschalten der Anzeige des Info-Screens
+        infoScreen.style.display = infoScreen.style.display === 'none' ? 'block' : 'none';
+    });
+    const closeInfoScreen = document.getElementById('close-info-screen');
+    closeInfoScreen.addEventListener('click', () => {
+        infoScreen.style.display = 'none';  
+    });
+}
+
+function fullscreen(){
+    // Implementierung der Vollbildfunktion
     let gameContainer = document.getElementById('fullscreen');
-    let buttonAreaBelow = document.querySelector('.button-area-below'); // Selector für button-area-below
     let fullscreenButton = document.getElementById('fullscreenButton');
 
     fullscreenButton.addEventListener('click', () => {
+        // Wechsel zwischen Vollbild- und Normalmodus
         if (!document.fullscreenElement) {
             gameContainer.requestFullscreen().catch(err => {
                 alert(`Fehler beim Versuch, in den Vollbildmodus zu wechseln: ${err.message}`);
@@ -75,25 +80,36 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
+    // Event-Listener für Änderungen im Vollbildmodus
     document.addEventListener("fullscreenchange", function() {
         if (document.fullscreenElement) {
-            document.body.classList.add('fullscreen-active'); // oder einem anderen geeigneten Elternelement
+            document.body.classList.add('fullscreen-active');
         } else {
             document.body.classList.remove('fullscreen-active');
         }
     });
+}
 
+function keybordActions(){
+    // Event-Listener für Tastaturinteraktionen
+    document.addEventListener("keydown", (event) => {
+        keyboard.handleKeyDown(event);
+    });
+
+    document.addEventListener("keyup", (event) => {
+        keyboard.handleKeyUp(event);
+    });
+}
+
+// Event-Listener, der beim Laden des DOM ausgelöst wird
+document.addEventListener("DOMContentLoaded", function() {
+    init(); // Aufruf der init-Funktion
+    startGame(); // Spiel starten
+    muteSounds(); // Stummschaltung der Sounds im Spiel
+    infoScreen(); // Aufrufen des Infoscreens
+    fullscreen(); // Vollbildmodus öffnen und Styleänderungen
+    keybordActions(); // Abgreifen der Keyboardeingaben
+    
 });
 
 
-document.addEventListener("keydown", (event) => {
-    // console.log('KeyDown Event:', event.key); // Debugging
-    keyboard.handleKeyDown(event);
-    // console.log('Keyboard Status after KeyDown:', keyboard); // Debugging
-});
-
-document.addEventListener("keyup", (event) => {
-    // console.log('KeyUp Event:', event.key); // Debugging
-    keyboard.handleKeyUp(event);
-    // console.log('Keyboard Status after KeyUp:', keyboard); // Debugging
-});

@@ -294,6 +294,22 @@ canvas {
   justify-content: space-evenly;
 }
 
+.story {
+  color: #000;
+  text-align: center;
+}
+
+.story p {
+  padding: 0px 10% 0 10%;
+  font-size: 20px;
+  letter-spacing: 1.1px;
+}
+
+.story h1 {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
 /* Responsive -------------- */
 
 @media only screen and (max-height: 480px) {

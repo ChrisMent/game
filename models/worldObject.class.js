@@ -1,4 +1,6 @@
 class WorldObject {
+    
+    // Initialisierung der Eigenschaften
     infoScreen = new InfoScreen();
     character = new Character()
     bottle = new Bottle() 
@@ -12,6 +14,7 @@ class WorldObject {
     gameIsRunning = false; 
 
     constructor(canvas, keyboard, level) {  
+        // Initialisierung von Canvas und Kontext
         this.ctx = canvas.getContext('2d');
         this.canvas = canvas;
         this.keyboard = keyboard;
@@ -23,6 +26,7 @@ class WorldObject {
         this.setWorld();
         this.endboss = new Endboss(this);
         this.level.enemies.push(this.endboss);
+        // Initialisierung der Statusleisten
         this.statusbars = {
             life: new Statusbar(15, 0, 75, 75, 'life', 0, this.ctx),
             bottle: new Statusbar(110, 10, 63, 63, 'bottle', 0, this.ctx),
@@ -33,28 +37,25 @@ class WorldObject {
         this.clouds.push(new Cloud(0)); // Wolke am Anfang
         this.clouds.push(new Cloud(2400 / 2)); // Wolke in der Mitte
         this.clouds.push(new Cloud(2400 - 350)); // Wolke am Ende
-
+        // Initialisierung der Endbildschirme
         this.endScreenTriggered = false;
         this.endScreenImage = new Image();
         this.endScreenImage.src = '../game/img/9_intro_outro_screens/youwin.png';
         this.endScreenImage.onload = () => {
              this.endScreenImageLoaded = true;
-
         }
-
-        //this.gameOverTriggered = false;
         this.gameOverImage = new Image();
         this.gameOverImage.src = '../game/img/9_intro_outro_screens/game_over/ohnoyoulost!.png';
         this.gameOverImage.onload = () => {
             this.gameOverImageLoaded = true;
         }
-        
+        // Starten der Spiellogik
         this.draw();
         this.run()
 
 
     }
-
+    // Methode zum Ausführen der Spiellogik
     run() {
         this.interval = setInterval(() => {
             this.checkCollisions();
@@ -72,46 +73,29 @@ class WorldObject {
         }, 200);
     }
 
+    //! Methoden für die Anzeige von End- und Game-Over-Bildschirmen
+
     showEndScreen() {
-        
-    // Verzögern Sie das Zeichnen des Endscreens um 3 Sekunden
+        // Verzögert das Zeichnen des Endscreens um 3 Sekunden
         setTimeout(() => {
-            clearInterval(this.interval);
-            this.gameIsRunning = false;
-            this.character.stopAnimation();
-            SoundManager.toggleMute(true);
-        
-            if (this.enemies) {
-                this.enemies.forEach(enemy => enemy.visible = false);
-            }
-            if (this.bottles) {
-                this.bottles.forEach(bottle => bottle.visible = false);
-            }
-            if (this.coins) {
-                this.coins.forEach(coin => coin.visible = false);
-            }
-            this.character.visible = false;
+            this.prepareForEndScreen();
             this.endScreenTriggered = true;
             this.drawEndScreen(); // Zeichnen des Endscreens
         }, 3000);
     }
-    
-    drawEndScreen() {
 
-        if (this.endScreenTriggered && this.endScreenImageLoaded) {
-            this.ctx.drawImage(this.endScreenImage, 0, 0, this.canvas.width, this.canvas.height);
-        }
-    }
-    
-    gameOver() {
-        this.gameOverTriggered = true;
+    // Vorbereitungen für das Anzeigen des Endbildschirms
+    prepareForEndScreen() {
         clearInterval(this.interval);
         this.gameIsRunning = false;
         this.character.stopAnimation();
-        
-        // Alle Sounds ausschalten
         SoundManager.toggleMute(true);
-    
+        this.hideAllObjects();
+        this.character.visible = false;
+    }
+
+    // Verbirgt alle Gegner, Flaschen und Münzen
+    hideAllObjects() {
         if (this.enemies) {
             this.enemies.forEach(enemy => enemy.visible = false);
         }
@@ -121,19 +105,60 @@ class WorldObject {
         if (this.coins) {
             this.coins.forEach(coin => coin.visible = false);
         }
-        this.character.visible = false;
-        this.drawGameOverScreen();
     }
     
+    drawEndScreen() {
+        if (this.endScreenTriggered && this.endScreenImageLoaded) {
+            this.ctx.drawImage(this.endScreenImage, 0, 0, this.canvas.width, this.canvas.height);
+        }
+    }
     
+    // Methode, die aufgerufen wird, wenn das Spiel verloren ist
+    gameOver() {
+        this.gameOverTriggered = true;
+        this.prepareForGameOver();
+        this.drawGameOverScreen();
+    }
 
+    // Vorbereitungen für das Anzeigen des Game-Over-Bildschirms
+    prepareForGameOver() {
+        clearInterval(this.interval);
+        this.gameIsRunning = false;
+        this.character.stopAnimation();
+        SoundManager.toggleMute(true); // Alle Sounds ausschalten
+        this.hideAllObjects();
+        this.character.visible = false;
+    }
+
+    // Verbirgt alle Gegner, Flaschen und Münzen (bereits definiert in showEndScreen-Optimierung)
+    hideAllObjects() {
+        if (this.enemies) {
+            this.enemies.forEach(enemy => enemy.visible = false);
+        }
+        if (this.bottles) {
+            this.bottles.forEach(bottle => bottle.visible = false);
+        }
+        if (this.coins) {
+            this.coins.forEach(coin => coin.visible = false);
+        }
+    }
+    
     drawGameOverScreen() {
         if (this.gameOverImageLoaded) {
             this.ctx.drawImage(this.gameOverImage, 0, 0, this.canvas.width, this.canvas.height);
         }
     }
 
+    //! Kollisions- und Sammellogik
+
+    // Überprüft Kollisionen zwischen verschiedenen Objekten
     checkCollisions() {
+        this.checkEnemyCollisions();
+        this.checkBottleCollisions();
+    }
+
+    // Überprüft Kollisionen zwischen dem Charakter und Feinden
+    checkEnemyCollisions() {
         this.level.enemies.forEach((enemy, index) => {
             if (this.jumpOnChicken(enemy)) {
                 enemy.playDeathAnimation();
@@ -142,24 +167,33 @@ class WorldObject {
                 this.character.hit();
                 this.drawLivesCount();
             }
-    
-            // Überprüfung der Kollision zwischen Flaschen und dem Endboss
-            this.bottles.forEach((bottle, bottleIndex) => {
-                if (bottle.isColliding(enemy) && enemy instanceof Endboss) {
-                    enemy.lives -= 1; // Ein Leben abziehen
-                    this.bottles.splice(bottleIndex, 1); // Flasche entfernen
-    
-                    if (enemy.lives > 0) {
-                        enemy.playHurtAnimation(); // Abspielen der Verletzungsanimation
-                    } else {
-                        enemy.playDeathAnimation();
-                    }
-                }
-            });
         });
     }
-    
-    
+
+    // Überprüft Kollisionen zwischen Flaschen und dem Endboss
+    checkBottleCollisions() {
+        this.level.enemies.forEach((enemy) => {
+            if (enemy instanceof Endboss) {
+                this.bottles.forEach((bottle, bottleIndex) => {
+                    if (bottle.isColliding(enemy)) {
+                        this.handleEndbossCollision(enemy, bottleIndex);
+                    }
+                });
+            }
+        });
+    }
+
+    // Handhabt die Kollision zwischen einer Flasche und dem Endboss
+    handleEndbossCollision(endboss, bottleIndex) {
+        endboss.lives -= 1; // Ein Leben abziehen
+        this.bottles.splice(bottleIndex, 1); // Flasche entfernen
+
+        if (endboss.lives > 0) {
+            endboss.playHurtAnimation(); // Abspielen der Verletzungsanimation
+        } else {
+            endboss.playDeathAnimation(); // Abspielen der Todesanimation
+        }
+    }
       
     jumpOnChicken(enemy) {
         let isJumpingOnChicken = (enemy.constructor === Chicken) &&
@@ -179,7 +213,6 @@ class WorldObject {
         // Entfernen des Enemys aus dem Spiel
         this.level.enemies.splice(index, 1);
     }
-
 
     checkForBottleCollection() {
         this.groundBottles.forEach((bottle, index) => {
@@ -202,20 +235,14 @@ class WorldObject {
     collectBottle(index) {
         this.groundBottles.splice(index, 1); // Entferne die Flasche vom Boden
         this.character.bottlesCollected++; // Füge eine Flasche zum Sammelzähler hinzu
-        
-        // Sound abspielen
-        this.character.collect_bottle_sound.play();
+        this.character.collect_bottle_sound.play(); // Sound abspielen
     
-       
-        // console.log('Bottle count: ', this.character.bottlesCollected)
     }
 
     collectCoin(index) {
         this.groundCoins.splice(index, 1); // Entferne die Münze vom Boden
         this.character.coinsCollected++; // Erhöhe die Anzahl der gesammelten Münzen
-
-        // Optional: Sound abspielen für das Sammeln einer Münze
-        this.character.collect_coin_sound.play();
+        this.character.collect_coin_sound.play(); // Optional: Sound abspielen für das Sammeln einer Münze
     }
 
     checkThrowObject() {
@@ -229,83 +256,87 @@ class WorldObject {
         }
     }
     
-    
+    //! Setzt die Welt für das Charakter-Objekt
     setWorld(){
         this.character.world = this
         this.character.animate();
     }
 
+    //! Zeichnet die Spielwelt
+    // Zeichnet die Spielwelt
     draw() {
-        if (this.gameOverTriggered) {
-            this.drawGameOverScreen();
-            return;
+        this.selectScreenToDraw();
+
+        if (!this.gameOverTriggered && !this.endScreenTriggered) {
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.infoScreen.draw(this.ctx);
+            this.drawGameScreen();
         }
 
-        if (this.endScreenTriggered) {
-            this.drawEndScreen();
-            return;
-        }
-
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        this.infoScreen.draw(this.ctx);
-
-        if (this.startScreen.isVisible) {
-            this.startScreen.draw(this.ctx);
-        } else {
-        // Verschiebe den Canvas basierend auf der Position der Kamera
-        this.ctx.save();   // Speichere den aktuellen Canvas-Zustand
-        this.ctx.translate(this.camera_x, 0);
-
-        this.updateCameraPosition();
-        
-
-        // Zeichne alle beweglichen und unbeweglichen Objekte
-        this.addBackgroundObjectsToMap();
-
-        
-        // Zeichne alle Wolken
-        this.clouds.forEach(cloud => {
-            cloud.draw(this.ctx); // Angenommen, Ihre Cloud-Klasse hat eine draw-Methode, die den Kontext benötigt
-        });
-
-        this.addObjectsToMap(this.level.enemies); 
-        this.addObjectsToMap(this.groundBottles);
-        this.addObjectsToMap(this.groundCoins);
-        this.addToMap(this.character);
-
-        // Aktualisiere die Statusleiste für gesammelte Flaschen basierend auf der Anzahl der gesammelten Flaschen
-        this.statusbars.bottle.showCollectedBottles(this.character.bottlesCollected);
-        this.statusbars.coin.showCollectedCoins(this.character.coinsCollected);
-               
-        // Kontinuierliche Kollisionsüberprüfung
-        this.checkCollisions();
-        this.applyGravityToCharacter();
-    
-        // Zeichne Objekte, die relativ zur Kamera beweglich sind, wie geworfene Flaschen
-        this.addObjectsToMap(this.bottles);
-    
-        // Stelle Kamera-Translation für fixe Objekte zurück
-        this.ctx.restore();
-    
-        // Zeichne fixe Objekte wie Statusleisten
-        this.addToMap(this.statusbars.life);
-        this.addToMap(this.statusbars.bottle);
-        this.addToMap(this.statusbars.coin);;
-        if (this.camera_x >= -2200 && this.camera_x <= -1800) {
-            this.addToMap(this.statusbars.endboss);
-        }
-
-        // Zeichnen des Textes für die Anzahl der gesammelten Flaschen, Leben und Coins
-        this.drawCollectedBottlesCount();
-        this.drawLivesCount();
-        this.drawCollectedCoinsCount()
-    }
-    
         // Forderung des nächsten Zeichenrahmens
         requestAnimationFrame(() => this.draw());
     }
+
+    // Entscheidet, welcher Bildschirm gezeichnet werden soll
+    selectScreenToDraw() {
+        if (this.gameOverTriggered) {
+            this.drawGameOverScreen();
+        } else if (this.endScreenTriggered) {
+            this.drawEndScreen();
+        }
+    }
+
+    // Zeichnet das reguläre Spiel
+    drawGameScreen() {
+        if (this.startScreen.isVisible) {
+            this.startScreen.draw(this.ctx);
+        } else {
+            this.prepareCanvasForGameObjects();
+            this.drawGameObjects();
+            this.restoreCanvasState();
+            this.drawFixedObjects();
+        }
+    }
+
+    // Bereitet den Canvas für Spielobjekte vor
+    prepareCanvasForGameObjects() {
+        this.ctx.save();
+        this.ctx.translate(this.camera_x, 0);
+        this.updateCameraPosition();
+    }
+
+    // Zeichnet bewegliche und unbewegliche Objekte
+    drawGameObjects() {
+        this.addBackgroundObjectsToMap();
+        this.clouds.forEach(cloud => cloud.draw(this.ctx));
+        this.addObjectsToMap(this.level.enemies);
+        this.addObjectsToMap(this.groundBottles);
+        this.addObjectsToMap(this.groundCoins);
+        this.addToMap(this.character);
+        this.checkCollisions();
+        this.applyGravityToCharacter();
+        this.addObjectsToMap(this.bottles);
+    }
+
+    // Stellt den Zustand des Canvas wieder her
+    restoreCanvasState() {
+        this.ctx.restore();
+    }
+
+    // Zeichnet feste Objekte wie Statusleisten
+    drawFixedObjects() {
+        this.addToMap(this.statusbars.life);
+        this.addToMap(this.statusbars.bottle);
+        this.addToMap(this.statusbars.coin);
+        if (this.camera_x >= -2200 && this.camera_x <= -1800) {
+            this.addToMap(this.statusbars.endboss);
+        }
+        this.drawCollectedBottlesCount();
+        this.drawLivesCount();
+        this.drawCollectedCoinsCount();
+    }
   
+    //! Hilfsmethoden für das Zeichnen
     drawCollectedBottlesCount() {
         if (this.statusbars.bottle.type === 'bottle') {
             this.ctx.font = "48px rio-grande"; // Schriftart und -größe
@@ -345,7 +376,6 @@ class WorldObject {
 
     updateCameraPosition() {
         // Aktualisiere die Kamera-Position basierend auf dem Character.
-        // Dies ist nur ein Beispiel und sollte angepasst werden, je nachdem wie du deine Kamera steuerst.
         this.camera_x = -this.character.x + 100;
     }
 
@@ -353,7 +383,6 @@ class WorldObject {
     // Durchinterieren für jedes Objekt im Canvas 
     addObjectsToMap(objects) {
         if (!objects) {
-            //console.error("Versuch, über undefiniertes Array zu iterieren in addObjectsToMap");
             return;
         }
 
@@ -362,20 +391,14 @@ class WorldObject {
         });
     }
     
-
     addToMap(object) {
         // Überprüfen, ob das Objekt in die entgegengesetzte Richtung gedreht werden soll
         if (object.otherDirection) {
             // Wenn ja, drehe das Bild horizontal
             this.flipImage(object);
         }
-
         // Zeichne das Objekt auf das Canvas
         object.draw(this.ctx);
-
-        // Zeichne ein Rechteck um das Objekt (nützlich für Debugging und Hitbox-Überprüfung)
-        //object.drawRect(this.ctx);
-
         // Stelle die ursprüngliche Richtung des Objekts wieder her, falls es gedreht wurde
         if (object.otherDirection) {
             this.flipImageRestore(object);
@@ -398,7 +421,6 @@ class WorldObject {
             this.character.speedY = 0;
         }
     }
-    
 
     // Funktion zum horizontalen Drehen des Objekts
     flipImage(object) {
@@ -421,7 +443,8 @@ class WorldObject {
         // Stelle den ursprünglichen Zustand des Canvas-Kontexts wieder her
         this.ctx.restore();
     }
-
+    
+    //! Startbildschirm umschalten   
     toggleStartScreen() {
         if (this.startScreen.isVisible) {
             this.startScreen.isVisible = false;

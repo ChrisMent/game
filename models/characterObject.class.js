@@ -1,21 +1,20 @@
 class Character extends MoveableObject {
-    world;
-    x = 0 // Position: this.world.camera_x = -this.x + 100
-    y = 150
-    height = 280
-    width = 100
-    speed = 4
-    lastX = 0;
-    lastActionTime = 0;
-    bottlesCollected = 0;
-    coinsCollected = 0;
-    lives = 5;
-    lastHit = 0
-    hasJustLanded = false; // Flag, um zu überwachen, ob der Charakter gerade gelandet ist
-    inAir = false; // Neue Eigenschaft, um zu verfolgen, ob das Objekt in der Luft ist
-    invulnerabilityDuration = 1000; 
-
-    
+    // Eigenschaften
+    world; // Referenz zur Spielwelt
+    x = 0; // Horizontale Position des Charakters
+    y = 150; // Vertikale Position des Charakters
+    height = 280; // Höhe des Charakters
+    width = 100; // Breite des Charakters
+    speed = 4; // Geschwindigkeit des Charakters
+    lastX = 0; // Letzte horizontale Position (für Bewegungen)
+    lastActionTime = 0; // Zeitpunkt der letzten Aktion
+    bottlesCollected = 0; // Anzahl gesammelter Flaschen
+    coinsCollected = 0; // Anzahl gesammelter Münzen
+    lives = 5; // Anzahl der Leben
+    lastHit = 0; // Zeitpunkt des letzten Treffers
+    hasJustLanded = false; // Überprüfung, ob der Charakter gerade gelandet ist
+    inAir = false; // Überprüfung, ob der Charakter in der Luft ist
+    invulnerabilityDuration = 1000; // Dauer der Unverwundbarkeit nach einem Treffer  
      
     IMAGES_WALKING = [
         '../game/img/2_character_pepe/2_walk/W-21.png',
@@ -115,84 +114,110 @@ class Character extends MoveableObject {
         
     }
 
-    animate() {
-        this.movementInterval = setInterval(() => {
-            if (!this.world || !this.world.keyboard) {
-                return; // Verlässt die Funktion, wenn die Welt oder die Tastatur nicht definiert sind
-            }
-            // Bewegen des Characters
-            this.walking_sound.pause();
-            if (this.world.keyboard.moveRight && this.x < this.world.level.level_end_x) {
-                this.moveRight();
-                this.walking_sound.play();
-                this.otherDirection = false;
-            } else if (this.world.keyboard.moveLeft && this.x > 0) {
-                this.moveLeft();
-                this.walking_sound.play();
-                this.otherDirection = true;
-            } else if (this.world.keyboard.pushSpace && !this.isAboveGround()) {
-                this.jump();
-                this.jump_sound.play();
-            }
-            this.world.camera_x = -this.x + 100;
-        }, 1000 / 60);
-    
-        this.animationInterval = setInterval(() => {
-            // Bewegungen animieren
-            let idleTime = this.isIdle();
-            if (idleTime > 2 && idleTime < 15) {
-                this.playAnimation(this.IMAGES_IDLE);
-            } else if (idleTime >= 15) {
-                this.playAnimation(this.IMAGES_LONG_IDLE);
-            } else if (this.isDeath()) {
-                this.playAnimation(this.IMAGES_DEATH);
-                this.die_sound.play();
-            } else if (this.isHurt()) {
-                this.playAnimation(this.IMAGES_HURT);
-                this.hurt_sound.play();
-            } else if (this.isAboveGround()) {
-                this.playAnimation(this.IMAGES_JUMPING);
-            } else if (this.world.keyboard.moveRight || this.world.keyboard.moveLeft) {
-                this.playAnimation(this.IMAGES_WALKING);
-            }
-        }, 125);
+   animate() {
+        this.movementInterval = setInterval(() => this.handleMovement(), 1000 / 60);
+        this.animationInterval = setInterval(() => this.handleAnimation(), 125);
     }
-    
+
+    handleMovement() {
+        if (!this.world || !this.world.keyboard) {
+            return;
+        }
+        this.walking_sound.pause();
+        if (this.canMoveRight()) 
+            this.moveRight();
+         else if (this.canMoveLeft()) 
+            this.moveLeft();
+         else if (this.canMoveJump()) 
+            this.jump();
+        this.world.camera_x = -this.x + 100;
+    }
+
+    canMoveRight(){
+        return this.world.keyboard.moveRight && this.x < this.world.level.level_end_x 
+    }
+
+    moveRight(){
+        super.moveRight();
+        this.walking_sound.play();
+        this.otherDirection = false;
+    }
+
+    canMoveLeft(){
+        return this.world.keyboard.moveLeft && this.x > 0
+    }
+
+    moveLeft(){
+        super.moveLeft();
+        this.walking_sound.play();
+        this.otherDirection = true;
+    }
+
+    canMoveJump(){
+        return this.world.keyboard.pushSpace && !this.isAboveGround()
+    }
+
+    jump(){
+        super.jump();
+        this.jump_sound.play();
+    }
+
+    handleAnimation() {
+        let idleTime = this.isIdle();
+        if (idleTime > 2 && idleTime < 15) {
+            this.playAnimation(this.IMAGES_IDLE);
+        } else if (idleTime >= 15) {
+            this.playAnimation(this.IMAGES_LONG_IDLE);
+        } else if (this.isDeath()) {
+            this.playAnimation(this.IMAGES_DEATH);
+            this.die_sound.play();
+        } else if (this.isHurt()) {
+            this.playAnimation(this.IMAGES_HURT);
+            this.hurt_sound.play();
+        } else if (this.isAboveGround()) {
+            this.playAnimation(this.IMAGES_JUMPING);
+        } else if (this.world.keyboard.moveRight || this.world.keyboard.moveLeft) {
+            this.playAnimation(this.IMAGES_WALKING);
+        }
+    }
+
+    // Methode zum Stoppen der Animation
     stopAnimation() {
         clearInterval(this.movementInterval);
         clearInterval(this.animationInterval);
     }
 
+    // Methode zum Verlieren eines Lebens
     loseLife() {
         if (this.lives > 0) {
             this.lives--;
-            //console.log('Leben verloren. Verbleibende Leben:', this.lives);
         }
         if (this.lives === 0) {
-            //console.log('Character ist gestorben.');
-            // Hier könnten Sie eine Logik für das Spielende implementieren.
         }
     }
 
+    // Methode für Treffer
     hit() {
         let currentTime = new Date().getTime();
         if (currentTime - this.lastHit > this.invulnerabilityDuration) {
             this.lives--;
             this.lastHit = currentTime;
-            // Weitere Logik bei Treffer, z.B. Abspielen eines Sounds
         }
     }
 
+    // Überprüfung, ob der Charakter tot ist
     isDeath() {
         return this.lives <= 0;
     }
 
+    // Überprüfung, ob der Charakter verletzt ist
     isHurt(){
         let timePassed = new Date().getTime() - this.lastHit // Differenz in ms
         timePassed = timePassed / 1000 // Berechnung der Differrenz in s
         return timePassed < 0.125 // Gibt true OR false zurück
     }
 
+    // Überprüfung, ob der Charakter inaktiv ist
     isIdle() {
         let currentTime = new Date().getTime();
         let timeElapsed = (currentTime - this.lastActionTime) / 1000; // Zeit in Sekunden
