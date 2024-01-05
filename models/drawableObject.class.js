@@ -1,11 +1,17 @@
+/**
+ * Grundlegende Klasse für Objekte, die im Spiel gezeichnet werden können.
+ * Verwaltet das Laden und Zeichnen von Bildern sowie das Zeichnen von Kollisionsbereichen.
+ */
 class DrawableObject {
     img; // Bild-Objekt für das DrawableObject
     ImgStorage = {}; // Speicher für geladene Bilder
     currentImage = 0; // Index für das aktuell angezeigte Bild
 
-    // Methoden
-
-    // Methode zum Laden eines einzelnen Bildes
+    /**
+     * Lädt ein Bild und setzt es als Bild-Objekt des DrawableObject.
+     * 
+     * @param {string} path - Pfad des Bildes, das geladen werden soll.
+     */
     loadImage(path) {
         this.img = new Image(); // Erstellung eines neuen Bild-Objekts
         this.img.onload = () => {
@@ -19,7 +25,11 @@ class DrawableObject {
         this.img.src = path; // Setzen des Bildpfades, startet den Ladevorgang
     }
     
-    // Methode zum Laden mehrerer Bilder
+    /**
+     * Lädt eine Reihe von Bildern und speichert sie im Bildspeicher.
+     * 
+     * @param {string[]} arr - Array von Bildpfaden, die geladen werden sollen.
+     */
     loadImages(arr) {
         arr.forEach((path) => {
             let img = new Image(); // Erstellung eines neuen Bild-Objekts für jeden Pfad
@@ -30,7 +40,11 @@ class DrawableObject {
         });
     }
 
-    // Methode zum Zeichnen des Objekts auf dem Canvas
+    /**
+     * Zeichnet das Objekt auf einem Canvas.
+     * 
+     * @param {CanvasRenderingContext2D} ctx - Der 2D-Kontext des Canvas, auf dem gezeichnet wird.
+     */
     draw(ctx) {
         // Überprüfung, ob ein Bild vorhanden ist und vollständig geladen wurde
         if (this.img && this.img.complete && this.img.naturalWidth !== 0) {
@@ -39,9 +53,12 @@ class DrawableObject {
         }
     }
 
-    // Methode zum Zeichnen eines Rechtecks um das Objekt (zur Visualisierung von Kollisionsbereichen)
+    /**
+     * Zeichnet ein Rechteck um das Objekt, um Kollisionsbereiche zu visualisieren.
+     * 
+     * @param {CanvasRenderingContext2D} ctx - Der 2D-Kontext des Canvas, auf dem das Rechteck gezeichnet wird.
+     */
     drawRect(ctx) {
-        // Zeichnen eines Rechtecks für Character-Objekte
         if (this instanceof Character) {
             ctx.beginPath();
             ctx.lineWidth = "2";
@@ -49,8 +66,6 @@ class DrawableObject {
             ctx.rect(this.x, this.y, this.width, this.height);
             ctx.stroke();
         }
-
-        // Zeichnen eines Rechtecks für Chicken-Objekte
         if (this instanceof Chicken) {
             ctx.beginPath();
             ctx.lineWidth = "2";

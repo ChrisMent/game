@@ -1,15 +1,36 @@
+/**
+ * Klasse für die Anzeige einer Statusleiste, erbt von DrawableObject.
+ * Zeigt verschiedene Informationen wie Lebenspunkte, gesammelte Flaschen oder Münzen an.
+ * 
+ * @property {number} collectedBottles - Anzahl der gesammelten Flaschen.
+ * @property {number} collectedCoins - Anzahl der gesammelten Münzen.
+ * @property {number} x - Horizontale Position der Statusleiste.
+ * @property {number} y - Vertikale Position der Statusleiste.
+ * @property {number} width - Breite der Statusleiste.
+ * @property {number} height - Höhe der Statusleiste.
+ * @property {string} type - Typ der Statusleiste (z.B. 'life', 'bottle', 'coin', 'endboss').
+ */
 class Statusbar extends DrawableObject {
-    collectedBottles = 0; // Anzahl der gesammelten Flaschen
-    collectedCoins = 0; // Anzahl der gesammelten Münzen
+    collectedBottles = 0;
+    collectedCoins = 0;
 
-    // Konstruktor
+    /**
+     * Konstruktor für die Statusbar.
+     * Initialisiert und lädt das Bild basierend auf dem Typ der Statusleiste.
+     * 
+     * @param {number} x - Horizontale Position der Statusleiste.
+     * @param {number} y - Vertikale Position der Statusleiste.
+     * @param {number} width - Breite der Statusleiste.
+     * @param {number} height - Höhe der Statusleiste.
+     * @param {string} type - Typ der Statusleiste.
+     */
     constructor(x, y, width, height, type) {
         super();
-        this.x = x; // Horizontale Position der Statusleiste
-        this.y = y; // Vertikale Position der Statusleiste
-        this.width = width; // Breite der Statusleiste
-        this.height = height; // Höhe der Statusleiste
-        this.type = type; // Typ der Statusleiste (z.B. 'life', 'bottle', 'coin', 'endboss')
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.type = type;
 
         // Laden des entsprechenden Bildes basierend auf dem Typ
         if (type === 'life') {
@@ -23,14 +44,22 @@ class Statusbar extends DrawableObject {
         }
     }
 
-    // Methode zum Aktualisieren der Anzahl gesammelter Flaschen
+    /**
+     * Aktualisiert die Anzahl der gesammelten Flaschen.
+     * 
+     * @param {number} count - Die neue Anzahl der gesammelten Flaschen.
+     */
     showCollectedBottles(count) {
         this.collectedBottles = count;
     }
 
-    // Methode zum Aktualisieren der Anzahl gesammelter Münzen
+    /**
+     * Aktualisiert die Anzahl der gesammelten Münzen.
+     * 
+     * @param {number} count - Die neue Anzahl der gesammelten Münzen.
+     */
     showCollectedCoins(count) {
         this.collectedCoins = count;
     }
-
 }
+

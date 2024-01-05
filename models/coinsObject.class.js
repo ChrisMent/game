@@ -1,11 +1,21 @@
+/**
+ * Klasse, die eine Münze repräsentiert. Erbt von MoveableObject.
+ * Verwaltet das Aussehen und die Positionierung einer Münze im Spiel.
+ */
 class Coin extends MoveableObject {
-    // Konstruktor für die Coin-Klasse
+    /**
+     * Konstruktor für die Coin-Klasse.
+     * Lädt das Bild der Münze und setzt ihre Größe und Position.
+     * 
+     * @param {number} x - Horizontale Position der Münze.
+     * @param {number} y - Vertikale Position der Münze.
+     */
     constructor(x, y) {
         super().loadImage('../game/img/8_coin/coin_1.png'); // Lädt das Bild der Münze
-        this.height = 100; // Setzt die Höhe der Münze
-        this.width = 100; // Setzt die Breite der Münze
-        this.x = x; // Setzt die horizontale Position der Münze
-        this.y = y; // Setzt die vertikale Position der Münze
+        this.height = 100;
+        this.width = 100; 
+        this.x = x; // Horizontale Position der Münze, abhängig vom Paramter
+        this.y = y; // Vertikale Position der Münze, abhängig vom Paramter
     }
-
 }
+

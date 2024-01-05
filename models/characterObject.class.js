@@ -1,20 +1,38 @@
+/**
+ * Klasse, die einen spielbaren Charakter repräsentiert, erbt von MoveableObject.
+ * 
+ * @property {Object} world - Referenz zur Spielwelt.
+ * @property {number} x - Horizontale Position des Charakters.
+ * @property {number} y - Vertikale Position des Charakters.
+ * @property {number} height - Höhe des Charakters.
+ * @property {number} width - Breite des Charakters.
+ * @property {number} speed - Geschwindigkeit des Charakters.
+ * @property {number} lastX - Letzte horizontale Position für Bewegungen.
+ * @property {number} lastActionTime - Zeitpunkt der letzten Aktion.
+ * @property {number} bottlesCollected - Anzahl gesammelter Flaschen.
+ * @property {number} coinsCollected - Anzahl gesammelter Münzen.
+ * @property {number} lives - Anzahl der Leben.
+ * @property {number} lastHit - Zeitpunkt des letzten Treffers.
+ * @property {boolean} hasJustLanded - Überprüfung, ob der Charakter gerade gelandet ist.
+ * @property {boolean} inAir - Überprüfung, ob der Charakter in der Luft ist.
+ * @property {number} invulnerabilityDuration - Dauer der Unverwundbarkeit nach einem Treffer in Millisekunden.
+ */
 class Character extends MoveableObject {
-    // Eigenschaften
-    world; // Referenz zur Spielwelt
-    x = 0; // Horizontale Position des Charakters
-    y = 150; // Vertikale Position des Charakters
-    height = 280; // Höhe des Charakters
-    width = 100; // Breite des Charakters
-    speed = 4; // Geschwindigkeit des Charakters
-    lastX = 0; // Letzte horizontale Position (für Bewegungen)
-    lastActionTime = 0; // Zeitpunkt der letzten Aktion
-    bottlesCollected = 0; // Anzahl gesammelter Flaschen
-    coinsCollected = 0; // Anzahl gesammelter Münzen
-    lives = 5; // Anzahl der Leben
-    lastHit = 0; // Zeitpunkt des letzten Treffers
-    hasJustLanded = false; // Überprüfung, ob der Charakter gerade gelandet ist
-    inAir = false; // Überprüfung, ob der Charakter in der Luft ist
-    invulnerabilityDuration = 1000; // Dauer der Unverwundbarkeit nach einem Treffer  
+    world;
+    x = 0;
+    y = 150;
+    height = 280;
+    width = 100;
+    speed = 4;
+    lastX = 0;
+    lastActionTime = 0;
+    bottlesCollected = 0;
+    coinsCollected = 0;
+    lives = 5;
+    lastHit = 0;
+    hasJustLanded = false;
+    inAir = false;
+    invulnerabilityDuration = 1000;
      
     IMAGES_WALKING = [
         '../game/img/2_character_pepe/2_walk/W-21.png',
@@ -83,21 +101,37 @@ class Character extends MoveableObject {
         '../game/img/2_character_pepe/1_idle/long_idle/I-20.png',
 
     ]
-
- 
-
+    /**
+     * Konstruktor für die Character-Klasse.
+     * Lädt alle notwendigen Bilder und Sounds für den Charakter und initialisiert grundlegende Eigenschaften.
+     * 
+     * @param {Object} world - Die Spielwelt, in der der Charakter existiert. Wird verwendet, um Interaktionen mit der Spielwelt zu ermöglichen.
+     */
     constructor(world){
         super().loadImage('../game/img/2_character_pepe/2_walk/W-21.png')
+        this.loadCharacterImages()
+        this.loadCharacterSounds()
+        this.world = world
+        this.lastX = this.x
+        this.lastActionTime = new Date().getTime()
+        this.applyGravity()
+    }
+    /**
+     * Lädt die Bilder für die Animationen
+     */
+    loadCharacterImages(){
         this.loadImages(this.IMAGES_WALKING)
         this.loadImages(this.IMAGES_JUMPING)
         this.loadImages(this.IMAGES_DEATH)
         this.loadImages(this.IMAGES_HURT)
         this.loadImages(this.IMAGES_IDLE)
         this.loadImages(this.IMAGES_LONG_IDLE)
-        this.world = world
-        this.lastX = this.x
-        this.lastActionTime = new Date().getTime()
-        this.applyGravity()
+    }
+
+    /**
+     * Lädt die Sounds für die Animationen
+     */
+    loadCharacterSounds(){
         this.walking_sound = new Audio('../game/audio/walking.mp3')
         this.hurt_sound = new Audio('../game/audio/pain.mp3')
         this.die_sound = new Audio('../game/audio/die.mp3')
@@ -110,15 +144,19 @@ class Character extends MoveableObject {
         SoundManager.addSound(this.jump_sound);
         SoundManager.addSound(this.collect_bottle_sound);
         SoundManager.addSound(this.collect_coin_sound);
-
-        
     }
 
+    /**
+     * Steuert die Animation des Charakters basierend auf dessen Zustand.
+     */
    animate() {
         this.movementInterval = setInterval(() => this.handleMovement(), 1000 / 60);
         this.animationInterval = setInterval(() => this.handleAnimation(), 125);
     }
 
+    /**
+     * Handhabt die Bewegung des Charakters basierend auf Eingaben und Spielzustand.
+     */
     handleMovement() {
         if (!this.world || !this.world.keyboard) {
             return;
@@ -133,35 +171,99 @@ class Character extends MoveableObject {
         this.world.camera_x = -this.x + 100;
     }
 
-    canMoveRight(){
-        return this.world.keyboard.moveRight && this.x < this.world.level.level_end_x 
+        /**
+     * Überprüft, ob der Charakter sich nach rechts bewegen kann.
+     * @returns {boolean} Wahr, wenn Bewegung nach rechts möglich ist.
+     */
+    canMoveRight() {
+        return this.world.keyboard.moveRight && this.x < this.world.level.level_end_x;
     }
 
-    moveRight(){
+    /**
+     * Bewegt den Charakter nach rechts und spielt das Gehgeräusch ab.
+     */
+    moveRight() {
         super.moveRight();
         this.walking_sound.play();
         this.otherDirection = false;
     }
 
-    canMoveLeft(){
-        return this.world.keyboard.moveLeft && this.x > 0
+    /**
+     * Überprüft, ob der Charakter sich nach links bewegen kann.
+     * @returns {boolean} Wahr, wenn Bewegung nach links möglich ist.
+     */
+    canMoveLeft() {
+        return this.world.keyboard.moveLeft && this.x > 0;
     }
 
-    moveLeft(){
+    /**
+     * Bewegt den Charakter nach links und spielt das Gehgeräusch ab.
+     */
+    moveLeft() {
         super.moveLeft();
         this.walking_sound.play();
         this.otherDirection = true;
     }
 
-    canMoveJump(){
-        return this.world.keyboard.pushSpace && !this.isAboveGround()
+    /**
+     * Überprüft, ob der Charakter springen kann.
+     * @returns {boolean} Wahr, wenn der Charakter springen kann.
+     */
+    canMoveJump() {
+        return this.world.keyboard.pushSpace && !this.isAboveGround();
     }
 
-    jump(){
+    /**
+     * Lässt den Charakter springen und spielt das Sprunggeräusch ab.
+     */
+    jump() {
         super.jump();
         this.jump_sound.play();
     }
 
+    /**
+     * Überprüft, ob der Charakter auf einen Feind (Chicken) springt.
+     * Ermöglicht dem Charakter einen weiteren Sprung, wenn er erfolgreich auf einen Feind springt.
+     * @param {MoveableObject} enemy - Das Feindobjekt.
+     * @returns {boolean} Gibt zurück, ob der Charakter auf das Chicken gesprungen ist.
+     */
+        jumpOnChicken(enemy) {
+            let isJumpingOnChicken = (enemy.constructor === Chicken) &&
+                this.isColliding(enemy) &&
+                this.isAboveGround() &&
+                this.speedY < 0;
+            if (isJumpingOnChicken) {
+                this.secondJump(); // Triggern eines weiteren Sprungs
+            }
+        
+            return isJumpingOnChicken;
+        }
+
+    /**
+     * Wendet Schwerkraft auf den Charakter an.
+     * Diese Methode sollte in jedem Frame aufgerufen werden, um die vertikale Bewegung des Charakters zu steuern.
+     */
+        applyGravityToCharacter() {
+            if (this.isAboveGround() || this.speedY > 0) {
+                this.inAir = true;
+                this.y -= this.speedY;
+                this.speedY -= this.acceleration;
+            } else {
+                if (this.y > 150) {
+                    this.y = 150;
+                    if (this.inAir) {
+                        this.showLandingImage(); // Zeige Landungsbild
+                    }
+                }
+                this.inAir = false;
+                this.speedY = 0;
+            }
+        }
+
+    /**
+     * Steuert die Animation des Charakters basierend auf dessen Zustand und Aktionen.
+     * Spielt verschiedene Animationen abhängig von der Inaktivität, dem Tod, Verletzungen, Sprüngen und der Bewegungsrichtung.
+     */
     handleAnimation() {
         let idleTime = this.isIdle();
         if (idleTime > 2 && idleTime < 15) {
@@ -181,13 +283,17 @@ class Character extends MoveableObject {
         }
     }
 
-    // Methode zum Stoppen der Animation
+    /**
+     * Stoppt die Animation des Charakters.
+     */
     stopAnimation() {
         clearInterval(this.movementInterval);
         clearInterval(this.animationInterval);
     }
 
-    // Methode zum Verlieren eines Lebens
+    /**
+     * Verringert die Lebenspunkte des Charakters und behandelt den Tod.
+     */
     loseLife() {
         if (this.lives > 0) {
             this.lives--;
@@ -196,7 +302,9 @@ class Character extends MoveableObject {
         }
     }
 
-    // Methode für Treffer
+    /**
+     * Behandelt den Treffer des Charakters und verringert die Lebenspunkte entsprechend.
+     */
     hit() {
         let currentTime = new Date().getTime();
         if (currentTime - this.lastHit > this.invulnerabilityDuration) {
@@ -205,23 +313,33 @@ class Character extends MoveableObject {
         }
     }
 
-    // Überprüfung, ob der Charakter tot ist
+    /**
+     * Überprüft, ob der Charakter tot ist.
+     * @returns {boolean} Wahr, wenn der Charakter keine Leben mehr hat.
+     */
     isDeath() {
         return this.lives <= 0;
     }
 
-    // Überprüfung, ob der Charakter verletzt ist
-    isHurt(){
-        let timePassed = new Date().getTime() - this.lastHit // Differenz in ms
-        timePassed = timePassed / 1000 // Berechnung der Differrenz in s
-        return timePassed < 0.125 // Gibt true OR false zurück
+    /**
+     * Überprüft, ob der Charakter verletzt ist. Eine Verletzung wird angenommen, wenn seit dem letzten Treffer weniger als 0,125 Sekunden vergangen sind.
+     * @returns {boolean} Wahr, wenn der Charakter kürzlich getroffen wurde und als verletzt gilt.
+     */
+    isHurt() {
+        let timePassed = new Date().getTime() - this.lastHit; 
+        timePassed = timePassed / 1000; // Umrechnung in Sekunden
+        return timePassed < 0.125; ist
     }
 
-    // Überprüfung, ob der Charakter inaktiv ist
+    /**
+     * Überprüft, wie lange der Charakter inaktiv (nicht bewegt) ist und gibt diese Zeit in Sekunden zurück.
+     * @returns {number} Zeit der Inaktivität in Sekunden.
+     */
     isIdle() {
         let currentTime = new Date().getTime();
-        let timeElapsed = (currentTime - this.lastActionTime) / 1000; // Zeit in Sekunden
+        let timeElapsed = (currentTime - this.lastActionTime) / 1000; 
         return timeElapsed;
     }
+
 
 }

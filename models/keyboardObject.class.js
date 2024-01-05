@@ -1,28 +1,47 @@
-// Definition der Klasse KeyboardObject
+/**
+ * Klasse für die Verwaltung von Tastatureingaben.
+ * Hält den Status der Tastatureingaben und verarbeitet Tastendruck- und Tastenloslass-Ereignisse.
+ */
 class KeyboardObject {
-    // Initialisierung der Zustände der Tastatureingaben
+    /**
+     * Klasse für die Verwaltung von Tastatureingaben.
+     * Hält den Status der Tastatureingaben und verarbeitet Tastendruck- und Tastenloslass-Ereignisse.
+     * 
+     * @property {boolean} moveRight - Status der Bewegung nach rechts.
+     * @property {boolean} moveLeft - Status der Bewegung nach links.
+     * @property {boolean} pushSpace - Status des Springens oder anderer Aktionen, die mit der Leertaste ausgelöst werden.
+     * @property {boolean} throwBottle - Status des Werfens einer Flasche oder einer anderen Aktion, die mit der Eingabetaste ausgelöst wird.
+     */
     moveRight = false;
     moveLeft = false;
     pushSpace = false;
     throwBottle = false;
 
-    // Methode zur Behandlung des Tastendrucks (KeyDown-Event)
+    /**
+     * Behandelt das Drücken von Tasten (KeyDown-Event).
+     * Aktualisiert die Zustände basierend auf der gedrückten Taste.
+     * 
+     * @param {KeyboardEvent} event - Das Tastendruck-Event.
+     */
     handleKeyDown(event) {
-        // Aktualisierung der Zustände basierend auf der gedrückten Taste
         if (event.key === "ArrowLeft") {
-            this.moveLeft = true; // Links bewegen
+            this.moveLeft = true; // Aktiviert die Bewegung nach links
         } else if (event.key === "ArrowRight") {
-            this.moveRight = true; // Rechts bewegen
+            this.moveRight = true; // Aktiviert die Bewegung nach rechts
         } else if (event.key === " ") {
-            this.pushSpace = true; // Springen oder andere Aktion
+            this.pushSpace = true; // Aktiviert die Sprungaktion
         } else if (event.key === "Enter") {
-            this.throwBottle = true; // Flasche werfen oder andere Aktion
+            this.throwBottle = true; // Aktiviert die Wurfaktion
         }
     }
 
-    // Methode zur Behandlung des Tastenloslassens (KeyUp-Event)
+    /**
+     * Behandelt das Loslassen von Tasten (KeyUp-Event).
+     * Setzt die Zustände zurück, wenn die Tasten losgelassen werden.
+     * 
+     * @param {KeyboardEvent} event - Das Tastenloslass-Event.
+     */
     handleKeyUp(event) {
-        // Zurücksetzen der Zustände, wenn die Tasten losgelassen werden
         if (event.key === "ArrowLeft") {
             this.moveLeft = false;
         } else if (event.key === "ArrowRight") {
@@ -34,15 +53,17 @@ class KeyboardObject {
         }  
     }
 
-    // Methode zum Aktivieren von berührungsbasierten Steuerungsknöpfen
+    /**
+     * Aktiviert berührungsbasierte Steuerungsknöpfe für bestimmte Aktionen.
+     * 
+     * @param {string} buttonId - Die ID des Buttons im HTML-Dokument.
+     * @param {string} action - Die Aktion, die durch den Button ausgelöst wird.
+     */
     activateButton(buttonId, action) {
-        // Auswahl des Buttons über seine ID
         const button = document.getElementById(buttonId);
-        // Hinzufügen von Event-Listenern für Touch-Events
-        button.addEventListener('touchstart', () => this[action] = true); // Aktion starten bei Berührung
-        button.addEventListener('touchend', () => this[action] = false); // Aktion beenden bei Loslassen
+        // Aktiviert die Aktion bei Berührung
+        button.addEventListener('touchstart', () => this[action] = true); 
+        // Deaktiviert die Aktion bei Loslassen
+        button.addEventListener('touchend', () => this[action] = false); 
     }
 }
-
-
-

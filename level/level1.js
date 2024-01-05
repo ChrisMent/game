@@ -1,6 +1,12 @@
-// Funktion, um eine Gruppe von Münzen zu erstellen
+/**
+ * Erstellt eine Gruppe von Münzen an einer bestimmten Startposition.
+ * 
+ * @param {number} startX - Die Start-X-Position der Münzgruppe.
+ * @param {number} startY - Die Start-Y-Position der Münzgruppe.
+ * @returns {Coin[]} Ein Array von Münzobjekten.
+ */
 function createCoinGroup(startX, startY) {
-    const coins = []; // Array, das die erstellten Münzen speichert
+    const coins = []; 
     const yOffset = [0, 30, 50, 30, 0]; // Y-Versatz für jede Münze in der Gruppe
 
     // Schleife zum Erstellen von 5 Münzen in einer Gruppe
@@ -13,28 +19,41 @@ function createCoinGroup(startX, startY) {
     return coins; // Rückgabe des Arrays mit Münzen
 }
 
-// Erstellen von Münzgruppen an verschiedenen Positionen
+/**
+ * Erstellt Münzgruppen an verschiedenen Positionen --> createCoinGroup(x, y).
+ */
 const coinGroups = [
-    ...createCoinGroup(200, 300), // Erste Gruppe von Münzen
-    ...createCoinGroup(1400, 300), // Zweite Gruppe von Münzen
-    // Weitere Gruppen können hier hinzugefügt werden
+    ...createCoinGroup(200, 300),
+    ...createCoinGroup(1400, 300),
+    // Weitere Gruppen...
 ];
 
-// Erstellen von einer Anzahl an Chicken-Objekten
-const chickens = Array.from({ length: 1 }, () => new Chicken());
+/**
+ * Erstellt eine vorgegebene Anzahl an Chicken-Objekten --> length: Anzahl der Chicken
+ */
+const chickens = Array.from({ length: 6 }, () => new Chicken());
 
-// Erstellen von Flaschen am Boden an zufälligen Positionen
+/**
+ * Erstellt Flaschen am Boden an zufälligen Positionen. --> length: Anzahl der Flschen
+ */
 const groundBottles = Array.from({ length: 5 }, (_, index) => new Bottle(300 + (Math.random() * 100 + 200 ) * index));
 
-// Kombinieren von verschiedenen Gegnern in einem Array
+/**
+ * Kombiniert verschiedene Gegner in einem Array.
+ */
 const enemies = [...chickens];
 
-// Erstellen von Wolken
+/**
+ * Erstellt Wolken.
+ */
 const clouds = [new Cloud()];
 
+/**
+ * Definiert Hintergrundobjekte des Spiels.
+ * Mehrere Instanzen von BackgroundImage werden erstellt, jeweils mit unterschiedlichen Bildpfaden und Positionen.
+ * Diese Objekte repräsentieren die verschiedenen Ebenen des Hintergrunds im Spiel.
+ */
 const backgroundObjects = [
-    // Hier werden mehrere Instanzen von BackgroundImage erstellt, jeweils mit verschiedenen Bildpfaden und Positionen
-    // Diese Objekte repräsentieren die verschiedenen Ebenen des Hintergrunds im Spiel
     new BackgroundImage('../game/img/5_background/layers/air.png', 719 * -1),
     new BackgroundImage('../game/img/5_background/layers/3_third_layer/2.png', 719 * -1),
     new BackgroundImage('../game/img/5_background/layers/2_second_layer/2.png', 719 * -1),
@@ -55,9 +74,12 @@ const backgroundObjects = [
     new BackgroundImage('../game/img/5_background/layers/3_third_layer/2.png', 719 * 3),
     new BackgroundImage('../game/img/5_background/layers/2_second_layer/2.png', 719 * 3),
     new BackgroundImage('../game/img/5_background/layers/1_first_layer/2.png', 719 * 3)
+    // Weiter Hintergrundbilder ...
 ];
 
-// Erstellen des Level-Objekts mit den vorher definierten Entitäten
+/**
+ * Erstellt das Level-Objekt mit den vorher definierten Entitäten.
+ */
 const level1 = new Level(
     enemies,            // Gegner
     groundBottles,      // Flaschen auf dem Boden

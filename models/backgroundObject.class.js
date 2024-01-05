@@ -1,14 +1,24 @@
-// Definition der Klasse BackgroundImage, die von MoveableObject erbt
-
+/**
+ * Klasse, die ein Hintergrundbild repräsentiert. Erbt von MoveableObject.
+ * 
+ * @property {number} width - Breite des Hintergrundbildes.
+ * @property {number} height - Höhe des Hintergrundbildes.
+ */
 class BackgroundImage extends MoveableObject {
-    width = 720; // Breite des Hintergrundbildes
-    height = 480; // Höhe des Hintergrundbildes
+    width = 720;
+    height = 480;
 
-    // Konstruktor der Klasse
+    /**
+     * Konstruktor für die BackgroundImage-Klasse.
+     * Lädt ein Hintergrundbild und setzt dessen Position.
+     * 
+     * @param {string} imagePath - Pfad des Hintergrundbildes.
+     * @param {number} x - Horizontale Position des Hintergrundbildes.
+     */
     constructor(imagePath, x) {
-        super().loadImage(imagePath); // Aufruf der loadImage-Methode der Elternklasse (MoveableObject) mit dem Bildpfad
-        this.x = x; // Setzen der horizontalen Position des Hintergrundbildes
-        this.y = 480 - this.height; // Setzen der vertikalen Position des Hintergrundbildes
-        // Die vertikale Position wird so gesetzt, dass das Bild am unteren Rand des Bildschirms ausgerichtet ist
+        super().loadImage(imagePath);
+        this.x = x;
+        this.y = 480 - this.height;
     }
 }
+
