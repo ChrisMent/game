@@ -28,7 +28,7 @@ class Character extends MoveableObject {
     lastActionTime = 0;
     bottlesCollected = 0;
     coinsCollected = 0;
-    lives = 5;
+    lives = 6;
     lastHit = 0;
     hasJustLanded = false;
     inAir = false;
@@ -227,17 +227,15 @@ class Character extends MoveableObject {
      * @param {MoveableObject} enemy - Das Feindobjekt.
      * @returns {boolean} Gibt zurück, ob der Charakter auf das Chicken gesprungen ist.
      */
-        jumpOnChicken(enemy) {
-            let isJumpingOnChicken = (enemy.constructor === Chicken) &&
-                this.isColliding(enemy) &&
-                this.isAboveGround() &&
-                this.speedY < 0;
-            if (isJumpingOnChicken) {
-                this.secondJump(); // Triggern eines weiteren Sprungs
-            }
-        
-            return isJumpingOnChicken;
+    jumpOnChicken(enemy) {
+        let isJumpingOnChicken = this.isColliding(enemy) && this.isAboveGround() && this.speedY < 0;
+    
+        if (isJumpingOnChicken) {
+            this.secondJump(); // Triggern eines weiteren Sprungs
         }
+    
+        return isJumpingOnChicken;
+    }  
 
     /**
      * Wendet Schwerkraft auf den Charakter an.

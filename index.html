@@ -24,6 +24,7 @@
     <script src="../game/models/soundObject.class.js"></script>
     <script src="../game/models/cloudObject.class.js"></script>
     <script src="../game/models/chickenObject.class.js"></script>
+    <script src="../game/models/chickenBabiesObject.class.js"></script>
     <script src="../game/models/backgroundObject.class.js"></script>
     <script src="../game/models/characterObject.class.js"></script>
     <script src="../game/models/statusbarObject.class.js"></script>
@@ -40,8 +41,14 @@
 </head>
 
 <body>
+    <div id="modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <p id="modal-message"></p>
+        </div>
+    </div>
 
-    <h1>El Pollo Loco</h1>
+    <h1 class="headline">El Pollo Loco</h1>
 
     <div class="game-container" id="fullscreen">
 

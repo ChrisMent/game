@@ -36,7 +36,7 @@ class Endboss extends MoveableObject {
     height = 320;
     width = 300;
     originalX = 2500;
-    attackDelay = 3000;
+    attackDelay = 750;
     imagesLoaded = false;
     isAttacking = false;
     isMoving = false;

@@ -20,6 +20,26 @@ body {
   font-family: "rio-grande", Helvetica, sans-serif;
 }
 
+.modal {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center;
+  color: #000;
+}
+
 h1 {
   font-size: 78px;
   letter-spacing: 6px;
@@ -29,7 +49,7 @@ h1 {
 
 .game-container {
   display: flex;
-  flex-direction: column; /* Änderung hier */
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 720px;
@@ -63,7 +83,7 @@ canvas {
 
 .button-area-below {
   display: flex;
-  justify-content: space-between; /* sorgt dafür, dass die Button-Gruppen auf gegenüberliegenden Seiten sind */
+  justify-content: space-between;
   align-items: center;
   flex-grow: 0;
   flex-shrink: 0;
@@ -73,7 +93,7 @@ canvas {
 .buttons-left,
 .buttons-right {
   display: flex;
-  flex-direction: row; /* vertikale Anordnung der Buttons in jeder Gruppe */
+  flex-direction: row;
   justify-content: center;
   align-items: center;
 }
@@ -85,11 +105,10 @@ canvas {
 
 .fullscreen-active .button-area-below {
   position: absolute;
-  bottom: 0; /* oder einen festen Abstand vom unteren Rand, wenn nötig */
+  bottom: 480px;
   left: 50%;
   transform: translateX(-50%); /* Zentriert die button-area-below horizontal */
   width: 720px; /* Breite entsprechend der ursprünglichen Größe des game-container */
-  height: 480px;
 }
 
 .game-interaction {
@@ -236,14 +255,14 @@ canvas {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   background-color: rgba(255, 255, 255, 1); /* Semi-transparenter Hintergrund */
-  z-index: 2000; /* Stellen Sie sicher, dass es über dem Canvas angezeigt wird */
+  z-index: 2000;
   border: solid 8px #1d1c1c;
-
   box-sizing: border-box;
   padding: 20px;
+  overflow-y: auto;
 }
 
 .desc-container {
@@ -327,6 +346,9 @@ canvas {
     max-width: 720px; /* Maximale Breite */
   }
 
+  .headline {
+    display: none;
+  }
   .button-area-below,
   .button-area-top {
     width: 100%; /* Anpassung der Breite der Button-Container */

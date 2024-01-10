@@ -1,27 +1,39 @@
-// Initialisierung der Variablen
+/**
+ * Initialisierung der Variablen
+ */
 let canvas;
 let world;
 let keyboard = new KeyboardObject();
 
-// init-Funktion, um das Spiel zu initialisieren
+/**
+ * Initialisiert das Spiel.
+ * - Wählt das Canvas-Element aus.
+ * - Erstellt eine neue Instanz der Klasse WorldObject.
+ * - Aktiviert die Tastatur-Interaktionen für Spielaktionen.
+ */
 function init() {
-    // Auswahl des Canvas-Elements
     canvas = document.querySelector('canvas');
-    // Erstellung einer neuen Instanz der Klasse oder des Konstruktors des WorldObject, dem Konstruktur der Klasse werden dabei 3 Parameter übergeben
-    world = new WorldObject(canvas, keyboard, level1); 
+    /**
+     * Erstellt eine neue WorldObject-Instanz.
+     * @param {HTMLCanvasElement} canvas - Das Canvas-Element für das Spiel.
+     * @param {KeyboardObject} keyboard - Tastatur-Interaktionsobjekt.
+     * @param {Object} level1 - Das erste Level des Spiels.
+     */
+    world = new WorldObject(canvas, keyboard, level1);
 
-    // Aktivieren der Tastatur-Interaktionen für Spielaktionen
     keyboard.activateButton('c_jump', 'pushSpace');
     keyboard.activateButton('c_throw', 'throwBottle');
     keyboard.activateButton('c_left', 'moveLeft');
     keyboard.activateButton('c_right', 'moveRight');
-
 }
 
+/**
+ * Startet das Spiel und fügt einen Event-Listener zum Start-Button hinzu.
+ * Beinhaltet die Logik zum Starten und Anhalten des Spiels.
+ */
 function startGame(){
     const startButton = document.getElementById('startButton');
     startButton.addEventListener('click', () => {
-        // Logik zum Starten und Anhalten des Spiels
         if (world.gameIsRunning) {
             world.startScreen.isVisible = true;
             location.reload();
@@ -31,11 +43,13 @@ function startGame(){
             world.gameIsRunning = true;    
         }
     });
-
 }
 
+/**
+ * Stummschalten der Sounds im Spiel.
+ * Fügt einen Event-Listener zum Mute-Button hinzu.
+ */
 function muteSounds(){
-    // Implementierung der Stummschaltung
     const muteButton = document.getElementById('muteButton');
     const muteIcon = document.getElementById('mute_icon');
     if (muteButton) {
@@ -45,17 +59,18 @@ function muteSounds(){
             muteIcon.innerText = isMuted ? 'volume_up' : 'volume_off';
         });
     } 
-
 }
 
+/**
+ * Anzeigen des Info-Screens.
+ * Fügt Event-Listener für den Info-Button und das Schließen des Info-Screens hinzu.
+ */
 function infoScreen(){
-    // Event-Listener für den Info-Button
     const infoButton = document.getElementById('info');
     const infoScreen = document.getElementById('infoScreen');
 
-    infoScreen.style.display = 'none'; // Anfangszustand des Info-Screens
+    infoScreen.style.display = 'none';
     infoButton.addEventListener('click', () => {
-        // Umschalten der Anzeige des Info-Screens
         infoScreen.style.display = infoScreen.style.display === 'none' ? 'block' : 'none';
     });
     const closeInfoScreen = document.getElementById('close-info-screen');
@@ -64,13 +79,15 @@ function infoScreen(){
     });
 }
 
+/**
+ * Implementierung der Vollbildfunktion.
+ * Fügt Event-Listener für den Vollbild-Button und Änderungen im Vollbildmodus hinzu.
+ */
 function fullscreen(){
-    // Implementierung der Vollbildfunktion
     let gameContainer = document.getElementById('fullscreen');
     let fullscreenButton = document.getElementById('fullscreenButton');
 
     fullscreenButton.addEventListener('click', () => {
-        // Wechsel zwischen Vollbild- und Normalmodus
         if (!document.fullscreenElement) {
             gameContainer.requestFullscreen().catch(err => {
                 alert(`Fehler beim Versuch, in den Vollbildmodus zu wechseln: ${err.message}`);
@@ -80,7 +97,6 @@ function fullscreen(){
         }
     });
 
-    // Event-Listener für Änderungen im Vollbildmodus
     document.addEventListener("fullscreenchange", function() {
         if (document.fullscreenElement) {
             document.body.classList.add('fullscreen-active');
@@ -90,8 +106,11 @@ function fullscreen(){
     });
 }
 
+/**
+ * Event-Listener für Tastaturinteraktionen.
+ * Behandelt keydown- und keyup-Ereignisse.
+ */
 function keybordActions(){
-    // Event-Listener für Tastaturinteraktionen
     document.addEventListener("keydown", (event) => {
         keyboard.handleKeyDown(event);
     });
@@ -101,15 +120,38 @@ function keybordActions(){
     });
 }
 
-// Event-Listener, der beim Laden des DOM ausgelöst wird
+/**
+ * Event-Listener, der beim Laden des DOM ausgelöst wird.
+ * Ruft init, startGame, muteSounds, infoScreen, fullscreen und keybordActions auf.
+ */
 document.addEventListener("DOMContentLoaded", function() {
-    init(); // Aufruf der init-Funktion
-    startGame(); // Spiel starten
-    muteSounds(); // Stummschaltung der Sounds im Spiel
-    infoScreen(); // Aufrufen des Infoscreens
-    fullscreen(); // Vollbildmodus öffnen und Styleänderungen
-    keybordActions(); // Abgreifen der Keyboardeingaben
-    
+    init();
+    startGame();
+    muteSounds();
+    infoScreen();
+    fullscreen();
+    keybordActions();
 });
 
-
+function checkScreenSize() {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const modal = document.getElementById('modal');
+    const message = document.getElementById('modal-message');
+  
+    if (width < 720) {
+      message.textContent = "Dein Device ist leider nicht geeignet verwende ein Device mit einer Breite von mindestens 720 Pixel.";
+      modal.style.display = 'flex';
+    } else if (height > width) {
+      message.textContent = "Bitte drehe um zu spielen dein Device ins Querformat.";
+      modal.style.display = 'flex';
+    } else {
+      modal.style.display = 'none';
+    }
+  }
+  
+  // Event Listener für Änderungen der Fenstergröße
+  window.addEventListener('resize', checkScreenSize);
+  
+  // Überprüfen Sie die Größe beim Laden der Seite
+  document.addEventListener("DOMContentLoaded", checkScreenSize);

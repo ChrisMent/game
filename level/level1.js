@@ -31,17 +31,22 @@ const coinGroups = [
 /**
  * Erstellt eine vorgegebene Anzahl an Chicken-Objekten --> length: Anzahl der Chicken
  */
-const chickens = Array.from({ length: 6 }, () => new Chicken());
+const chickens = Array.from({ length: 3 }, () => new Chicken());
+
+/**
+ * Erstellt eine vorgegebene Anzahl an Chicken-Objekten --> length: Anzahl der Chicken
+ */
+const chickensBabies = Array.from({ length: 2 }, () => new ChickenBabies());
 
 /**
  * Erstellt Flaschen am Boden an zufälligen Positionen. --> length: Anzahl der Flschen
  */
-const groundBottles = Array.from({ length: 5 }, (_, index) => new Bottle(300 + (Math.random() * 100 + 200 ) * index));
+const groundBottles = Array.from({ length: 10 }, (_, index) => new Bottle(300 + (Math.random() * 100 + 200 ) * index));
 
 /**
  * Kombiniert verschiedene Gegner in einem Array.
  */
-const enemies = [...chickens];
+const enemies = [...chickens,...chickensBabies];
 
 /**
  * Erstellt Wolken.
