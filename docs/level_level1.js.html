@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: level/level1.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: level/level1.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Generates a group of coins in a specified formation.
+ * @param {number} startX - The starting X coordinate for the first coin.
+ * @param {number} startY - The starting Y coordinate for the first coin.
+ * @returns {Coin[]} An array of Coin objects.
+ */
+function createCoinGroup(startX, startY) {
+  const coins = [];
+  const yOffset = [0, 30, 50, 30, 0];
+  for (let i = 0; i &lt; 5; i++) {
+    const x = startX + i * 45;
+    const y = startY - yOffset[i];
+    coins.push(new Coin(x, y));
+  }
+  return coins;
+}
+
+/**
+ * Creates groups of coins positioned at specified coordinates.
+ */
+const coinGroups = [
+  ...createCoinGroup(200, 300),
+  ...createCoinGroup(1400, 300),
+];
+
+/**
+ * Creates an array of Chicken enemies.
+ */
+const chickens = Array.from({ length: 3 }, () => new Chicken());
+
+/**
+ * Creates an array of ChickenBabies enemies.
+ */
+const chickensBabies = Array.from({ length: 2 }, () => new ChickenBabies());
+
+/**
+ * Creates an array of ground Bottles spread across the level.
+ */
+const groundBottles = Array.from(
+  { length: 10 },
+  (_, index) => new Bottle(300 + (Math.random() * 100 + 200) * index)
+);
+
+/**
+ * Combines chickens and chicken babies into a single array of enemies.
+ */
+const enemies = [...chickens, ...chickensBabies];
+
+/**
+ * Creates an array containing a single cloud object.
+ */
+const clouds = [new Cloud()];
+
+/**
+ * Creates an array of background objects to be rendered in the game.
+ */
+const backgroundObjects = [
+  new BackgroundImage("../game/img/5_background/layers/air.png", 719 * -1),
+  new BackgroundImage(
+    "../game/img/5_background/layers/3_third_layer/2.png",
+    719 * -1
+  ),
+  new BackgroundImage(
+    "../game/img/5_background/layers/2_second_layer/2.png",
+    719 * -1
+  ),
+  new BackgroundImage(
+    "../game/img/5_background/layers/1_first_layer/2.png",
+    719 * -1
+  ),
+  new BackgroundImage("../game/img/5_background/layers/air.png", 0),
+  new BackgroundImage("../game/img/5_background/layers/3_third_layer/1.png", 0),
+  new BackgroundImage(
+    "../game/img/5_background/layers/2_second_layer/1.png",
+    0
+  ),
+  new BackgroundImage("../game/img/5_background/layers/1_first_layer/1.png", 0),
+  new BackgroundImage("../game/img/5_background/layers/air.png", 719),
+  new BackgroundImage(
+    "../game/img/5_background/layers/3_third_layer/2.png",
+    719
+  ),
+  new BackgroundImage(
+    "../game/img/5_background/layers/2_second_layer/2.png",
+    719
+  ),
+  new BackgroundImage(
+    "../game/img/5_background/layers/1_first_layer/2.png",
+    719
+  ),
+  new BackgroundImage("../game/img/5_background/layers/air.png", 719 * 2),
+  new BackgroundImage(
+    "../game/img/5_background/layers/3_third_layer/1.png",
+    719 * 2
+  ),
+  new BackgroundImage(
+    "../game/img/5_background/layers/2_second_layer/1.png",
+    719 * 2
+  ),
+  new BackgroundImage(
+    "../game/img/5_background/layers/1_first_layer/1.png",
+    719 * 2
+  ),
+  new BackgroundImage("../game/img/5_background/layers/air.png", 719 * 3),
+  new BackgroundImage(
+    "../game/img/5_background/layers/3_third_layer/2.png",
+    719 * 3
+  ),
+  new BackgroundImage(
+    "../game/img/5_background/layers/2_second_layer/2.png",
+    719 * 3
+  ),
+  new BackgroundImage(
+    "../game/img/5_background/layers/1_first_layer/2.png",
+    719 * 3
+  ),
+];
+
+/**
+ * Initializes the first level with the specified game objects.
+ */
+const level1 = new Level(
+  enemies,
+  groundBottles,
+  clouds,
+  backgroundObjects,
+  coinGroups
+);
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BackgroundImage.html">BackgroundImage</a></li><li><a href="Bottle.html">Bottle</a></li><li><a href="Character.html">Character</a></li><li><a href="Chicken.html">Chicken</a></li><li><a href="ChickenBabies.html">ChickenBabies</a></li><li><a href="Cloud.html">Cloud</a></li><li><a href="Coin.html">Coin</a></li><li><a href="DrawableObject.html">DrawableObject</a></li><li><a href="EndGameObject.html">EndGameObject</a></li><li><a href="Endboss.html">Endboss</a></li><li><a href="InfoScreen.html">InfoScreen</a></li><li><a href="KeyboardObject.html">KeyboardObject</a></li><li><a href="Level.html">Level</a></li><li><a href="MoveableObject.html">MoveableObject</a></li><li><a href="SoundManager.html">SoundManager</a></li><li><a href="StartScreen.html">StartScreen</a></li><li><a href="Statusbar.html">Statusbar</a></li><li><a href="WorldObject.html">WorldObject</a></li><li><a href="throwAbleObject.html">throwAbleObject</a></li></ul><h3>Global</h3><ul><li><a href="global.html#adjustForMobileDevices">adjustForMobileDevices</a></li><li><a href="global.html#backgroundObjects">backgroundObjects</a></li><li><a href="global.html#checkScreenSize">checkScreenSize</a></li><li><a href="global.html#chickens">chickens</a></li><li><a href="global.html#chickensBabies">chickensBabies</a></li><li><a href="global.html#clouds">clouds</a></li><li><a href="global.html#coinGroups">coinGroups</a></li><li><a href="global.html#createCoinGroup">createCoinGroup</a></li><li><a href="global.html#enemies">enemies</a></li><li><a href="global.html#fullscreen">fullscreen</a></li><li><a href="global.html#groundBottles">groundBottles</a></li><li><a href="global.html#infoScreen">infoScreen</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#initializeGame">initializeGame</a></li><li><a href="global.html#isMobileDevice">isMobileDevice</a></li><li><a href="global.html#keybordActions">keybordActions</a></li><li><a href="global.html#level1">level1</a></li><li><a href="global.html#muteSounds">muteSounds</a></li><li><a href="global.html#startGame">startGame</a></li><li><a href="global.html#triggerGameOver">triggerGameOver</a></li><li><a href="global.html#triggerWin">triggerWin</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Mar 15 2024 14:56:16 GMT+0100 (Mitteleuropäische Normalzeit)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
