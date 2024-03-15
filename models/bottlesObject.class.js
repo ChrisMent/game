@@ -1,19 +1,18 @@
 /**
- * Klasse, die eine Flasche repräsentiert. Erbt von MoveableObject.
+ * Represents a bottle object in the game, extending the MoveableObject class to inherit movement capabilities.
  */
 class Bottle extends MoveableObject {
-    /**
-     * Konstruktor für die Bottle-Klasse.
-     * Lädt das Bild der Flasche und setzt die Größe und Position.
-     * 
-     * @param {number} x - Horizontale Position der Flasche.
-     */
-    constructor(x) {
-        super().loadImage('../game/img/6_salsa_bottle/1_salsa_bottle_on_ground.png'); // Lädt das Bild der Flasche
-        this.height = 70; // Höhe der Flasche
-        this.width = 60; // Breite der Flasche
-        this.x = x; // Horizontale Position der Flasche abhängig vom Parameter
-        this.y = 356; // Vertikale Position der Flasche (nahe dem Boden)
-    }
+  /**
+   * Constructs a new bottle instance.
+   * @param {number} x - The initial x-coordinate of the bottle.
+   */
+  constructor(x) {
+    super(); // Calls the constructor of the MoveableObject class.
+    // Initialization and property setting is done below:
+    this.loadImage("../game/img/6_salsa_bottle/1_salsa_bottle_on_ground.png"); // Loads the bottle image.
+    this.height = 70; // Sets the height of the bottle object.
+    this.width = 60; // Sets the width of the bottle object.
+    this.x = x; // Sets the initial x-coordinate.
+    this.y = 356; // Sets the initial y-coordinate to place the bottle on the ground.
+  }
 }
-

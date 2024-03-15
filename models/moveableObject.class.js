@@ -1,119 +1,137 @@
 /**
- * Klasse für bewegliche Objekte, erbt von DrawableObject.
- * Enthält grundlegende Mechanismen für Bewegung, Schwerkraft und Kollisionserkennung.
- * 
- * @property {number} speed - Geschwindigkeit des Objekts.
- * @property {boolean} otherDirection - Richtungswechsel (wahr, wenn die Richtung umgekehrt wird).
- * @property {number} speedY - Vertikale Geschwindigkeit, insbesondere für Sprünge.
- * @property {number} acceleration - Beschleunigung, hauptsächlich für Schwerkrafteffekte.
+ * Class representing objects that can move within the game world, extending DrawableObject.
  */
 class MoveableObject extends DrawableObject {
-    speed = 0.15;
-    otherDirection = false; 
-    speedY = 0;
-    acceleration = 1.5;
-    /**
-     * Wendet Schwerkraft auf das Objekt an.
-     * Aktualisiert die vertikale Position basierend auf der Geschwindigkeit und Schwerkraft.
-     */
-    applyGravity() {
-        setInterval(() => {
-            if (this.isAboveGround() || this.speedY > 0) {
-                this.inAir = true;
-                this.y -= this.speedY; // Bewegung nach oben oder unten
-                this.speedY -= this.acceleration; // Anpassen der Geschwindigkeit durch Schwerkraft
-            } else {
-                this.inAir = false; // Das Objekt hat den Boden erreicht
-                this.speedY = 0;
-            }
-        }, 1000 / 45); 
-    }
-    /**
-     * Zeigt ein Landungsbild, typischerweise nach einem Sprung.
-     * Wird verwendet, um eine spezifische Landungsanimation oder ein Bild anzuzeigen.
-     */
-    showLandingImage() {
-        let landingImagePath = this.IMAGES_JUMPING[8]; // Pfad zum Landungsbild
-        this.img = this.ImgStorage[landingImagePath]; // Aktualisiert das Bild des Objekts
-    }
-    /**
-     * Überprüft, ob sich das Objekt über dem Boden befindet.
-     * 
-     * @returns {boolean} Wahr, wenn sich das Objekt über dem Boden befindet.
-     */
-    isAboveGround() {
-        if(this instanceof throwAbleObject){
-            return true;
-        } else {
-            return this.y < 150; // Grundlinie für Schwerkraft-Logik
-        }
-    }
-    /**
-     * Bewegt das Objekt nach links.
-     */
-    moveLeft() {
-        this.x -= this.speed; // Aktualisieren der X-Position
-        this.lastX = this.x;
-        this.lastActionTime = new Date().getTime();
-    }
-    /**
-     * Bewegt das Objekt nach rechts.
-     */
-    moveRight() {
-        this.x += this.speed; // Aktualisieren der X-Position
-        this.lastX = this.x;
-        this.lastActionTime = new Date().getTime();
-    }
-    /**
-     * Lässt das Objekt springen.
-     */
-    jump() {
-        this.speedY = 25; // Festlegen der Sprunggeschwindigkeit
-        this.isJumping = true;
-        this.lastX = this.x;
-        this.lastActionTime = new Date().getTime();
-    }
-    /**
-     * Führt einen zweiten Sprung aus, wenn das Objekt bereits springt.
-     */
-    secondJump() {
-        this.speedY = 15; // Geringere Sprunggeschwindigkeit für den zweiten Sprung
-        this.isJumping = true;
-        this.lastX = this.x;
-        this.lastActionTime = new Date().getTime();
-    }
-    /**
-     * Spielt eine Animation aus einem Array von Bildpfaden ab.
-     * 
-     * @param {string[]} arr - Array von Bildpfaden für die Animation.
-     */
-    playAnimation(arr) {
-        let i = this.currentImage % arr.length; // Index des aktuellen Bildes
-        let path = arr[i]; // Pfad des aktuellen Bildes
-        this.img = this.ImgStorage[path]; // Aktualisieren des Bildes
+  /**
+   * The speed at which the object moves horizontally.
+   */
+  speed = 0.15;
 
-        if (this.img && this.img.complete) {
-            this.currentImage++; // Inkrementieren für die nächste Animation
+  /**
+   * Indicates if the object is moving in the opposite direction.
+   */
+  otherDirection = false;
+
+  /**
+   * The vertical speed of the object, used for jumping or falling.
+   */
+  speedY = 0;
+
+  /**
+   * The acceleration, affecting the rate of speed change when jumping or falling.
+   */
+  acceleration = 2;
+
+  /**
+   * Applies gravity effect to the object, making it fall down or jump.
+   */
+  applyGravity() {
+    const gravityInterval = setInterval(() => {
+      if (this.isAboveGround() || this.speedY > 0) {
+        this.inAir = true;
+        this.y -= this.speedY;
+        if (this.speedY > 0) {
+          this.speedY -= this.acceleration;
         } else {
-            console.error("Bild nicht geladen oder definiert:", path);
+          this.speedY -= this.acceleration;
         }
+      } else {
+        clearInterval(gravityInterval);
+        this.inAir = false;
+        this.y = 150;
+        this.speedY = 0;
+      }
+    }, 1000 / 60);
+  }
+
+  /**
+   * Displays the landing image for the object when it lands on the ground.
+   */
+  showLandingImage() {
+    let landingImagePath = this.IMAGES_JUMPING[8];
+    this.img = this.ImgStorage[landingImagePath];
+  }
+
+  /**
+   * Checks if the object is above the ground.
+   * @returns {boolean} True if the object is above the ground.
+   */
+  isAboveGround() {
+    if (this instanceof throwAbleObject) {
+      return true;
+    } else {
+      return this.y < 150;
     }
-    /**
-     * Überprüft, ob dieses Objekt mit einem anderen Objekt kollidiert.
-     * 
-     * @param {MoveableObject} obj - Das andere Objekt, mit dem die Kollision überprüft wird.
-     * @returns {boolean} Wahr, wenn eine Kollision vorliegt.
-     */
-    isColliding(obj) {
-        // Rechter Rand dieses Objekts ist rechts vom linken Rand des anderen Objekts
-        return  this.x + this.width > obj.x &&
-        // Unterer Rand dieses Objekts ist unterhalb vom oberen Rand des anderen Objekts    
-                this.y + this.height > obj.y &&
-        // Linker Rand dieses Objekts ist links vom rechten Rand des anderen Objekts
-                this.x < obj.x + obj.width &&
-        // Oberer Rand dieses Objekts ist oberhalb vom unteren Rand des anderen Objekts
-                this.y < obj.y + obj.height;       
+  }
+
+  /**
+   * Moves the object to the left by reducing its x-coordinate.
+   */
+  moveLeft() {
+    this.x -= this.speed;
+    this.lastX = this.x;
+    this.lastActionTime = new Date().getTime();
+  }
+
+  /**
+   * Moves the object to the right by increasing its x-coordinate.
+   */
+  moveRight() {
+    this.x += this.speed;
+    this.lastX = this.x;
+    this.lastActionTime = new Date().getTime();
+  }
+
+  /**
+   * Initiates a jumping action by setting a vertical speed.
+   */
+  jump() {
+    this.speedY = 23;
+    this.isJumping = true;
+    this.lastX = this.x;
+    this.lastActionTime = new Date().getTime();
+  }
+
+  /**
+   * Initiates a second jump, usually while the object is already in the air, to increase its vertical speed.
+   */
+  secondJump() {
+    this.speedY = 15;
+    this.isJumping = true;
+    this.lastX = this.x;
+    this.lastActionTime = new Date().getTime();
+  }
+
+  /**
+   * Plays a given array of images as an animation for the object.
+   * @param {string[]} arr - The array of image paths representing the animation frames.
+   */
+  playAnimation(arr) {
+    let i = Math.floor(this.currentImage) % arr.length;
+    let path = arr[i];
+    this.img = this.ImgStorage[path];
+    if (this.img && this.img.complete) {
+      if (this.inAir && arr === this.IMAGES_JUMPING) {
+        this.currentImage += 0.5;
+      } else {
+        this.currentImage++;
+      }
+    } else {
+      console.info("Image not yet loaded or defined:", path);
     }
+  }
+
+  /**
+   * Checks if this object is colliding with another object.
+   * @param {DrawableObject} obj - The other object to check collision against.
+   * @returns {boolean} True if there is a collision.
+   */
+  isColliding(obj) {
+    return (
+      this.x + this.width > obj.x &&
+      this.y + this.height > obj.y &&
+      this.x < obj.x + obj.width &&
+      this.y < obj.y + obj.height
+    );
+  }
 }
-
-

@@ -1,343 +1,449 @@
 /**
- * Klasse, die einen spielbaren Charakter repräsentiert, erbt von MoveableObject.
- * 
- * @property {Object} world - Referenz zur Spielwelt.
- * @property {number} x - Horizontale Position des Charakters.
- * @property {number} y - Vertikale Position des Charakters.
- * @property {number} height - Höhe des Charakters.
- * @property {number} width - Breite des Charakters.
- * @property {number} speed - Geschwindigkeit des Charakters.
- * @property {number} lastX - Letzte horizontale Position für Bewegungen.
- * @property {number} lastActionTime - Zeitpunkt der letzten Aktion.
- * @property {number} bottlesCollected - Anzahl gesammelter Flaschen.
- * @property {number} coinsCollected - Anzahl gesammelter Münzen.
- * @property {number} lives - Anzahl der Leben.
- * @property {number} lastHit - Zeitpunkt des letzten Treffers.
- * @property {boolean} hasJustLanded - Überprüfung, ob der Charakter gerade gelandet ist.
- * @property {boolean} inAir - Überprüfung, ob der Charakter in der Luft ist.
- * @property {number} invulnerabilityDuration - Dauer der Unverwundbarkeit nach einem Treffer in Millisekunden.
+ * Represents a character in the game.
+ * @extends MoveableObject
  */
 class Character extends MoveableObject {
-    world;
-    x = 0;
-    y = 150;
-    height = 280;
-    width = 100;
-    speed = 4;
-    lastX = 0;
-    lastActionTime = 0;
-    bottlesCollected = 0;
-    coinsCollected = 0;
-    lives = 6;
-    lastHit = 0;
-    hasJustLanded = false;
-    inAir = false;
-    invulnerabilityDuration = 1000;
-     
-    IMAGES_WALKING = [
-        '../game/img/2_character_pepe/2_walk/W-21.png',
-        '../game/img/2_character_pepe/2_walk/W-22.png',
-        '../game/img/2_character_pepe/2_walk/W-23.png',
-        '../game/img/2_character_pepe/2_walk/W-24.png',
-        '../game/img/2_character_pepe/2_walk/W-25.png',
-        '../game/img/2_character_pepe/2_walk/W-26.png'
-    
-    ]
+  /**
+   * The world object in which the character exists.
+   * @type {World}
+   */
+  world;
 
-    IMAGES_JUMPING = [
-        '../game/img/2_character_pepe/3_jump/J-31.png',
-        '../game/img/2_character_pepe/3_jump/J-32.png',
-        '../game/img/2_character_pepe/3_jump/J-33.png',
-        '../game/img/2_character_pepe/3_jump/J-34.png',
-        '../game/img/2_character_pepe/3_jump/J-35.png',
-        '../game/img/2_character_pepe/3_jump/J-36.png',
-        '../game/img/2_character_pepe/3_jump/J-37.png',
-        '../game/img/2_character_pepe/3_jump/J-38.png',
-        '../game/img/2_character_pepe/3_jump/J-39.png'
-    
-    ]
+  /**
+   * The x-coordinate of the character.
+   * @type {number}
+   */
+  x = 0;
 
-    IMAGES_DEATH = [
-        '../game/img/2_character_pepe/5_dead/D-51.png',
-        '../game/img/2_character_pepe/5_dead/D-52.png',
-        '../game/img/2_character_pepe/5_dead/D-53.png',
-        '../game/img/2_character_pepe/5_dead/D-54.png',
-        '../game/img/2_character_pepe/5_dead/D-55.png',
-        '../game/img/2_character_pepe/5_dead/D-56.png',
-        '../game/img/2_character_pepe/5_dead/D-57.png'
+  /**
+   * The y-coordinate of the character.
+   * @type {number}
+   */
+  y = 150;
 
-    ]
+  /**
+   * The height of the character.
+   * @type {number}
+   */
+  height = 280;
 
-    IMAGES_HURT = [
-        '../game/img/2_character_pepe/4_hurt/H-41.png',
-        '../game/img/2_character_pepe/4_hurt/H-42.png',
-        '../game/img/2_character_pepe/4_hurt/H-43.png'
-    ]
+  /**
+   * The width of the character.
+   * @type {number}
+   */
+  width = 100;
 
-    IMAGES_IDLE = [
-        '../game/img/2_character_pepe/1_idle/idle/I-1.png',
-        '../game/img/2_character_pepe/1_idle/idle/I-2.png',
-        '../game/img/2_character_pepe/1_idle/idle/I-3.png',
-        '../game/img/2_character_pepe/1_idle/idle/I-4.png',
-        '../game/img/2_character_pepe/1_idle/idle/I-5.png',
-        '../game/img/2_character_pepe/1_idle/idle/I-6.png',
-        '../game/img/2_character_pepe/1_idle/idle/I-7.png',
-        '../game/img/2_character_pepe/1_idle/idle/I-8.png',
-        '../game/img/2_character_pepe/1_idle/idle/I-9.png',
-        '../game/img/2_character_pepe/1_idle/idle/I-10.png'
+  /**
+   * The speed of the character.
+   * @type {number}
+   */
+  speed = 4;
 
-    ]
+  /**
+   * The last x-coordinate of the character.
+   * @type {number}
+   */
+  lastX = 0;
 
-    IMAGES_LONG_IDLE = [
-        '../game/img/2_character_pepe/1_idle/long_idle/I-11.png',
-        '../game/img/2_character_pepe/1_idle/long_idle/I-12.png',
-        '../game/img/2_character_pepe/1_idle/long_idle/I-13.png',
-        '../game/img/2_character_pepe/1_idle/long_idle/I-14.png',
-        '../game/img/2_character_pepe/1_idle/long_idle/I-15.png',
-        '../game/img/2_character_pepe/1_idle/long_idle/I-16.png',
-        '../game/img/2_character_pepe/1_idle/long_idle/I-17.png',
-        '../game/img/2_character_pepe/1_idle/long_idle/I-18.png',
-        '../game/img/2_character_pepe/1_idle/long_idle/I-19.png',
-        '../game/img/2_character_pepe/1_idle/long_idle/I-20.png',
+  /**
+   * The last action time of the character.
+   * @type {number}
+   */
+  lastActionTime = 0;
 
-    ]
-    /**
-     * Konstruktor für die Character-Klasse.
-     * Lädt alle notwendigen Bilder und Sounds für den Charakter und initialisiert grundlegende Eigenschaften.
-     * 
-     * @param {Object} world - Die Spielwelt, in der der Charakter existiert. Wird verwendet, um Interaktionen mit der Spielwelt zu ermöglichen.
-     */
-    constructor(world){
-        super().loadImage('../game/img/2_character_pepe/2_walk/W-21.png')
-        this.loadCharacterImages()
-        this.loadCharacterSounds()
-        this.world = world
-        this.lastX = this.x
-        this.lastActionTime = new Date().getTime()
-        this.applyGravity()
+  /**
+   * The number of bottles collected by the character.
+   * @type {number}
+   */
+  bottlesCollected = 0;
+
+  /**
+   * The number of coins collected by the character.
+   * @type {number}
+   */
+  coinsCollected = 0;
+
+  /**
+   * The number of lives the character has.
+   * @type {number}
+   */
+  lives = 6;
+
+  /**
+   * The last hit time of the character.
+   * @type {number}
+   */
+  lastHit = 0;
+
+  /**
+   * Indicates if the character has just landed.
+   * @type {boolean}
+   */
+  hasJustLanded = false;
+
+  /**
+   * Indicates if the character is in the air.
+   * @type {boolean}
+   */
+  inAir = false;
+
+  /**
+   * The duration of invulnerability for the character.
+   * @type {number}
+   */
+  invulnerabilityDuration = 1000;
+
+  // Arrays of image paths for character animations
+
+  /**
+   * Array of image paths for walking animation.
+   * @type {string[]}
+   */
+  IMAGES_WALKING = [
+    "../game/img/2_character_pepe/2_walk/W-21.png",
+    "../game/img/2_character_pepe/2_walk/W-22.png",
+    "../game/img/2_character_pepe/2_walk/W-23.png",
+    "../game/img/2_character_pepe/2_walk/W-24.png",
+    "../game/img/2_character_pepe/2_walk/W-25.png",
+    "../game/img/2_character_pepe/2_walk/W-26.png",
+  ];
+
+  /**
+   * Array of image paths for jumping animation.
+   * @type {string[]}
+   */
+  IMAGES_JUMPING = [
+    "../game/img/2_character_pepe/3_jump/J-31.png",
+    "../game/img/2_character_pepe/3_jump/J-32.png",
+    "../game/img/2_character_pepe/3_jump/J-33.png",
+    "../game/img/2_character_pepe/3_jump/J-34.png",
+    "../game/img/2_character_pepe/3_jump/J-35.png",
+    "../game/img/2_character_pepe/3_jump/J-36.png",
+    "../game/img/2_character_pepe/3_jump/J-37.png",
+    "../game/img/2_character_pepe/3_jump/J-38.png",
+    "../game/img/2_character_pepe/3_jump/J-39.png",
+  ];
+
+  /**
+   * Array of image paths for death animation.
+   * @type {string[]}
+   */
+  IMAGES_DEATH = [
+    "../game/img/2_character_pepe/5_dead/D-51.png",
+    "../game/img/2_character_pepe/5_dead/D-52.png",
+    "../game/img/2_character_pepe/5_dead/D-53.png",
+    "../game/img/2_character_pepe/5_dead/D-54.png",
+    "../game/img/2_character_pepe/5_dead/D-55.png",
+    "../game/img/2_character_pepe/5_dead/D-56.png",
+    "../game/img/2_character_pepe/5_dead/D-57.png",
+  ];
+
+  /**
+   * Array of image paths for hurt animation.
+   * @type {string[]}
+   */
+  IMAGES_HURT = [
+    "../game/img/2_character_pepe/4_hurt/H-41.png",
+    "../game/img/2_character_pepe/4_hurt/H-42.png",
+    "../game/img/2_character_pepe/4_hurt/H-43.png",
+  ];
+
+  /**
+   * Array of image paths for idle animation.
+   * @type {string[]}
+   */
+  IMAGES_IDLE = [
+    "../game/img/2_character_pepe/1_idle/idle/I-1.png",
+    "../game/img/2_character_pepe/1_idle/idle/I-2.png",
+    "../game/img/2_character_pepe/1_idle/idle/I-3.png",
+    "../game/img/2_character_pepe/1_idle/idle/I-4.png",
+    "../game/img/2_character_pepe/1_idle/idle/I-5.png",
+    "../game/img/2_character_pepe/1_idle/idle/I-6.png",
+    "../game/img/2_character_pepe/1_idle/idle/I-7.png",
+    "../game/img/2_character_pepe/1_idle/idle/I-8.png",
+    "../game/img/2_character_pepe/1_idle/idle/I-9.png",
+    "../game/img/2_character_pepe/1_idle/idle/I-10.png",
+  ];
+
+  /**
+   * Array of image paths for long idle animation.
+   * @type {string[]}
+   */
+  IMAGES_LONG_IDLE = [
+    "../game/img/2_character_pepe/1_idle/long_idle/I-11.png",
+    "../game/img/2_character_pepe/1_idle/long_idle/I-12.png",
+    "../game/img/2_character_pepe/1_idle/long_idle/I-13.png",
+    "../game/img/2_character_pepe/1_idle/long_idle/I-14.png",
+    "../game/img/2_character_pepe/1_idle/long_idle/I-15.png",
+    "../game/img/2_character_pepe/1_idle/long_idle/I-16.png",
+    "../game/img/2_character_pepe/1_idle/long_idle/I-17.png",
+    "../game/img/2_character_pepe/1_idle/long_idle/I-18.png",
+    "../game/img/2_character_pepe/1_idle/long_idle/I-19.png",
+    "../game/img/2_character_pepe/1_idle/long_idle/I-20.png",
+  ];
+  /**
+   * Constructor to initialize the character object.
+   * @param {World} world - The world object in which the character exists.
+   */
+  /**
+   * Constructor to initialize the character object.
+   * @param {World} world - The world object in which the character exists.
+   */
+  constructor(world) {
+    super().loadImage("../game/img/2_character_pepe/2_walk/W-21.png");
+    this.loadCharacterImages();
+    this.loadCharacterSounds();
+    this.world = world;
+    this.lastX = this.x;
+    this.lastActionTime = new Date().getTime();
+    this.applyGravity();
+  }
+
+  /**
+   * Loads the character images for animations.
+   */
+  loadCharacterImages() {
+    this.loadImages(this.IMAGES_WALKING);
+    this.loadImages(this.IMAGES_JUMPING);
+    this.loadImages(this.IMAGES_DEATH);
+    this.loadImages(this.IMAGES_HURT);
+    this.loadImages(this.IMAGES_IDLE);
+    this.loadImages(this.IMAGES_LONG_IDLE);
+  }
+
+  /**
+   * Loads the character sounds for interactions.
+   */
+  loadCharacterSounds() {
+    this.walking_sound = new Audio("../game/audio/walking.mp3");
+    this.hurt_sound = new Audio("../game/audio/pain.mp3");
+    this.die_sound = new Audio("../game/audio/die.mp3");
+    this.jump_sound = new Audio("../game/audio/jump.mp3");
+    this.collect_bottle_sound = new Audio("../game/audio/bottle_collect.mp3");
+    this.collect_coin_sound = new Audio("../game/audio/coin.mp3");
+    SoundManager.addSound(this.walking_sound);
+    SoundManager.addSound(this.hurt_sound);
+    SoundManager.addSound(this.die_sound);
+    SoundManager.addSound(this.jump_sound);
+    SoundManager.addSound(this.collect_bottle_sound);
+    SoundManager.addSound(this.collect_coin_sound);
+  }
+
+  /**
+   * Initiates the animation for the character.
+   */
+  animate() {
+    this.movementInterval = setInterval(() => this.handleMovement(), 1000 / 60);
+    this.animationInterval = setInterval(() => this.handleAnimation(), 200);
+  }
+
+  /**
+   * Handles the movement of the character based on user input.
+   */
+  handleMovement() {
+    if (!this.world || !this.world.keyboard) {
+      return;
     }
-    /**
-     * Lädt die Bilder für die Animationen
-     */
-    loadCharacterImages(){
-        this.loadImages(this.IMAGES_WALKING)
-        this.loadImages(this.IMAGES_JUMPING)
-        this.loadImages(this.IMAGES_DEATH)
-        this.loadImages(this.IMAGES_HURT)
-        this.loadImages(this.IMAGES_IDLE)
-        this.loadImages(this.IMAGES_LONG_IDLE)
+    this.walking_sound.pause();
+    if (this.canMoveRight()) {
+      this.moveRight();
+    }
+    if (this.canMoveLeft()) {
+      this.moveLeft();
+    }
+    if (this.canMoveJump()) {
+      this.jump();
+    }
+    this.world.camera_x = -this.x + 100;
+  }
+
+  /**
+   * Checks if the character can move to the right.
+   * @returns {boolean} True if the character can move right, false otherwise.
+   */
+  canMoveRight() {
+    return (
+      this.world.keyboard.moveRight && this.x < this.world.level.level_end_x
+    );
+  }
+
+  /**
+   * Moves the character to the right.
+   */
+  moveRight() {
+    super.moveRight();
+    this.walking_sound.play();
+    this.otherDirection = false;
+  }
+
+  /**
+   * Checks if the character can move to the left.
+   * @returns {boolean} True if the character can move left, false otherwise.
+   */
+  canMoveLeft() {
+    return this.world.keyboard.moveLeft && this.x > 0;
+  }
+
+  /**
+   * Moves the character to the left.
+   */
+  moveLeft() {
+    super.moveLeft();
+    this.walking_sound.play();
+    this.otherDirection = true;
+  }
+
+  /**
+   * Checks if the character can perform a jump.
+   * @returns {boolean} True if the character can jump, false otherwise.
+   */
+  canMoveJump() {
+    return this.world.keyboard.pushSpace && !this.isAboveGround();
+  }
+
+  /**
+   * Initiates the character's jump action.
+   */
+  jump() {
+    if (!this.inAir) {
+      super.jump();
+      this.speedY = 25;
+      this.jump_sound.play();
+      this.inAir = true;
+    }
+  }
+
+  /**
+   * Handles the character's jump on a chicken enemy.
+   * @param {Enemy} enemy - The enemy character.
+   * @returns {boolean} True if the character jumps on the enemy, false otherwise.
+   */
+  jumpOnChicken(enemy) {
+    let isJumpingOnChicken =
+      this.isColliding(enemy) && this.isAboveGround() && this.speedY < 0;
+
+    if (isJumpingOnChicken) {
+      this.secondJump();
     }
 
-    /**
-     * Lädt die Sounds für die Animationen
-     */
-    loadCharacterSounds(){
-        this.walking_sound = new Audio('../game/audio/walking.mp3')
-        this.hurt_sound = new Audio('../game/audio/pain.mp3')
-        this.die_sound = new Audio('../game/audio/die.mp3')
-        this.jump_sound = new Audio('../game/audio/jump.mp3')
-        this.collect_bottle_sound = new Audio('../game/audio/bottle_collect.mp3')
-        this.collect_coin_sound = new Audio('../game/audio/coin.mp3')
-        SoundManager.addSound(this.walking_sound);
-        SoundManager.addSound(this.hurt_sound);
-        SoundManager.addSound(this.die_sound);
-        SoundManager.addSound(this.jump_sound);
-        SoundManager.addSound(this.collect_bottle_sound);
-        SoundManager.addSound(this.collect_coin_sound);
-    }
+    return isJumpingOnChicken;
+  }
 
-    /**
-     * Steuert die Animation des Charakters basierend auf dessen Zustand.
-     */
-   animate() {
-        this.movementInterval = setInterval(() => this.handleMovement(), 1000 / 60);
-        this.animationInterval = setInterval(() => this.handleAnimation(), 125);
-    }
-
-    /**
-     * Handhabt die Bewegung des Charakters basierend auf Eingaben und Spielzustand.
-     */
-    handleMovement() {
-        if (!this.world || !this.world.keyboard) {
-            return;
+  /**
+   * Applies gravity to the character's movement.
+   */
+  applyGravityToCharacter() {
+    if (this.isAboveGround() || this.speedY > 0) {
+      this.y -= this.speedY;
+      if (this.speedY > 0) {
+        this.speedY -= this.acceleration;
+      } else {
+        this.speedY -= this.acceleration / 4;
+      }
+      if (this.isJumping || this.inAir) {
+        this.playJumpAnimationBasedOnHeightOrSpeedY();
+      }
+    } else {
+      if (this.y > 150) {
+        this.y = 150;
+        if (this.inAir) {
+          this.showLandingImage();
+          this.inAir = false;
         }
-        this.walking_sound.pause();
-        if (this.canMoveRight()) 
-            this.moveRight();
-         else if (this.canMoveLeft()) 
-            this.moveLeft();
-         else if (this.canMoveJump()) 
-            this.jump();
-        this.world.camera_x = -this.x + 100;
+      }
+      this.speedY = 0;
     }
+  }
 
-        /**
-     * Überprüft, ob der Charakter sich nach rechts bewegen kann.
-     * @returns {boolean} Wahr, wenn Bewegung nach rechts möglich ist.
-     */
-    canMoveRight() {
-        return this.world.keyboard.moveRight && this.x < this.world.level.level_end_x;
+  /**
+   * Plays the jump animation based on the character's height or speed.
+   */
+  playJumpAnimationBasedOnHeightOrSpeedY() {
+    const totalImages = this.IMAGES_JUMPING.length;
+    const animationSpeedFactor = 3;
+    let imageIndex = Math.abs(Math.floor(this.speedY / animationSpeedFactor));
+    if (imageIndex >= totalImages) {
+      imageIndex = totalImages - 1;
     }
+    this.img = this.ImgStorage[this.IMAGES_JUMPING[imageIndex]];
+  }
 
-    /**
-     * Bewegt den Charakter nach rechts und spielt das Gehgeräusch ab.
-     */
-    moveRight() {
-        super.moveRight();
-        this.walking_sound.play();
-        this.otherDirection = false;
+  /**
+   * Handles the character's animation based on its actions.
+   */
+  handleAnimation() {
+    let idleTime = this.isIdle();
+    if (idleTime > 2 && idleTime < 15) {
+      this.playAnimation(this.IMAGES_IDLE);
+    } else if (idleTime >= 15) {
+      this.playAnimation(this.IMAGES_LONG_IDLE);
+    } else if (this.isDeath()) {
+      this.playAnimation(this.IMAGES_DEATH);
+      this.die_sound.play();
+    } else if (this.isHurt()) {
+      this.playAnimation(this.IMAGES_HURT);
+      this.hurt_sound.play();
+    } else if (this.world.keyboard.moveRight || this.world.keyboard.moveLeft) {
+      this.playAnimation(this.IMAGES_WALKING);
     }
+  }
 
-    /**
-     * Überprüft, ob der Charakter sich nach links bewegen kann.
-     * @returns {boolean} Wahr, wenn Bewegung nach links möglich ist.
-     */
-    canMoveLeft() {
-        return this.world.keyboard.moveLeft && this.x > 0;
+  /**
+   * Stops the character's animation.
+   */
+  stopAnimation() {
+    clearInterval(this.movementInterval);
+    clearInterval(this.animationInterval);
+  }
+
+  /**
+   * Reduces the character's life count by 1.
+   */
+  loseLife() {
+    if (this.lives > 0) {
+      this.lives--;
     }
-
-    /**
-     * Bewegt den Charakter nach links und spielt das Gehgeräusch ab.
-     */
-    moveLeft() {
-        super.moveLeft();
-        this.walking_sound.play();
-        this.otherDirection = true;
+    if (this.lives === 0) {
+      // Perform actions when lives reach 0
     }
+  }
 
-    /**
-     * Überprüft, ob der Charakter springen kann.
-     * @returns {boolean} Wahr, wenn der Charakter springen kann.
-     */
-    canMoveJump() {
-        return this.world.keyboard.pushSpace && !this.isAboveGround();
+  /**
+   * Registers a hit on the character.
+   */
+  hit() {
+    let currentTime = new Date().getTime();
+    if (currentTime - this.lastHit > this.invulnerabilityDuration) {
+      this.lives--;
+      this.lastHit = currentTime;
     }
+  }
 
-    /**
-     * Lässt den Charakter springen und spielt das Sprunggeräusch ab.
-     */
-    jump() {
-        super.jump();
-        this.jump_sound.play();
-    }
+  /**
+   * Checks if the character is dead (no lives left).
+   * @returns {boolean} True if the character is dead, false otherwise.
+   */
+  isDeath() {
+    return this.lives <= 0;
+  }
 
-    /**
-     * Überprüft, ob der Charakter auf einen Feind (Chicken) springt.
-     * Ermöglicht dem Charakter einen weiteren Sprung, wenn er erfolgreich auf einen Feind springt.
-     * @param {MoveableObject} enemy - Das Feindobjekt.
-     * @returns {boolean} Gibt zurück, ob der Charakter auf das Chicken gesprungen ist.
-     */
-    jumpOnChicken(enemy) {
-        let isJumpingOnChicken = this.isColliding(enemy) && this.isAboveGround() && this.speedY < 0;
-    
-        if (isJumpingOnChicken) {
-            this.secondJump(); // Triggern eines weiteren Sprungs
-        }
-    
-        return isJumpingOnChicken;
-    }  
+  /**
+   * Checks if the character is hurt based on the invulnerability duration.
+   * @returns {boolean} True if the character is hurt, false otherwise.
+   */
+  isHurt() {
+    let timePassed = new Date().getTime() - this.lastHit;
+    timePassed = timePassed / 1000;
+    return timePassed < 0.125;
+  }
 
-    /**
-     * Wendet Schwerkraft auf den Charakter an.
-     * Diese Methode sollte in jedem Frame aufgerufen werden, um die vertikale Bewegung des Charakters zu steuern.
-     */
-        applyGravityToCharacter() {
-            if (this.isAboveGround() || this.speedY > 0) {
-                this.inAir = true;
-                this.y -= this.speedY;
-                this.speedY -= this.acceleration;
-            } else {
-                if (this.y > 150) {
-                    this.y = 150;
-                    if (this.inAir) {
-                        this.showLandingImage(); // Zeige Landungsbild
-                    }
-                }
-                this.inAir = false;
-                this.speedY = 0;
-            }
-        }
-
-    /**
-     * Steuert die Animation des Charakters basierend auf dessen Zustand und Aktionen.
-     * Spielt verschiedene Animationen abhängig von der Inaktivität, dem Tod, Verletzungen, Sprüngen und der Bewegungsrichtung.
-     */
-    handleAnimation() {
-        let idleTime = this.isIdle();
-        if (idleTime > 2 && idleTime < 15) {
-            this.playAnimation(this.IMAGES_IDLE);
-        } else if (idleTime >= 15) {
-            this.playAnimation(this.IMAGES_LONG_IDLE);
-        } else if (this.isDeath()) {
-            this.playAnimation(this.IMAGES_DEATH);
-            this.die_sound.play();
-        } else if (this.isHurt()) {
-            this.playAnimation(this.IMAGES_HURT);
-            this.hurt_sound.play();
-        } else if (this.isAboveGround()) {
-            this.playAnimation(this.IMAGES_JUMPING);
-        } else if (this.world.keyboard.moveRight || this.world.keyboard.moveLeft) {
-            this.playAnimation(this.IMAGES_WALKING);
-        }
-    }
-
-    /**
-     * Stoppt die Animation des Charakters.
-     */
-    stopAnimation() {
-        clearInterval(this.movementInterval);
-        clearInterval(this.animationInterval);
-    }
-
-    /**
-     * Verringert die Lebenspunkte des Charakters und behandelt den Tod.
-     */
-    loseLife() {
-        if (this.lives > 0) {
-            this.lives--;
-        }
-        if (this.lives === 0) {
-        }
-    }
-
-    /**
-     * Behandelt den Treffer des Charakters und verringert die Lebenspunkte entsprechend.
-     */
-    hit() {
-        let currentTime = new Date().getTime();
-        if (currentTime - this.lastHit > this.invulnerabilityDuration) {
-            this.lives--;
-            this.lastHit = currentTime;
-        }
-    }
-
-    /**
-     * Überprüft, ob der Charakter tot ist.
-     * @returns {boolean} Wahr, wenn der Charakter keine Leben mehr hat.
-     */
-    isDeath() {
-        return this.lives <= 0;
-    }
-
-    /**
-     * Überprüft, ob der Charakter verletzt ist. Eine Verletzung wird angenommen, wenn seit dem letzten Treffer weniger als 0,125 Sekunden vergangen sind.
-     * @returns {boolean} Wahr, wenn der Charakter kürzlich getroffen wurde und als verletzt gilt.
-     */
-    isHurt() {
-        let timePassed = new Date().getTime() - this.lastHit; 
-        timePassed = timePassed / 1000; // Umrechnung in Sekunden
-        return timePassed < 0.125; ist
-    }
-
-    /**
-     * Überprüft, wie lange der Charakter inaktiv (nicht bewegt) ist und gibt diese Zeit in Sekunden zurück.
-     * @returns {number} Zeit der Inaktivität in Sekunden.
-     */
-    isIdle() {
-        let currentTime = new Date().getTime();
-        let timeElapsed = (currentTime - this.lastActionTime) / 1000; 
-        return timeElapsed;
-    }
-
-
+  /**
+   * Calculates the time elapsed since the last action of the character.
+   * @returns {number} The time elapsed in seconds.
+   */
+  isIdle() {
+    let currentTime = new Date().getTime();
+    let timeElapsed = (currentTime - this.lastActionTime) / 1000;
+    return timeElapsed;
+  }
 }

@@ -1,45 +1,45 @@
 /**
- * Klasse für ein werfbares Objekt, erbt von MoveableObject.
- * Repräsentiert Objekte, die im Spiel geworfen werden können, wie Flaschen.
- * 
- * @property {number} collectedBottles - Anzahl der gesammelten Flaschen, die für eine Wurfbegrenzung verwendet werden können.
- * @property {number} x - Horizontale Startposition des Objekts.
- * @property {number} y - Vertikale Startposition des Objekts.
- * @property {number} width - Breite des Objekts.
- * @property {number} height - Höhe des Objekts.
- * @property {number} speedX - Horizontale Geschwindigkeit des Objekts.
- * @property {number} speedY - Vertikale Geschwindigkeit des Objekts.
+ * Represents an object that can be thrown by the player, such as a bottle.
+ * Extends MoveableObject to inherit movement capabilities like gravity.
  */
 class throwAbleObject extends MoveableObject {
-    collectedBottles = 0;
-    /**
-     * Konstruktor für ein werfbares Objekt.
-     * Initialisiert das Objekt und startet die Wurfbewegung.
-     * 
-     * @param {number} x - Horizontale Startposition des Objekts.
-     * @param {number} y - Vertikale Startposition des Objekts.
-     */
-    constructor(x, y) {
-        super().loadImage('../game/img/6_salsa_bottle/2_salsa_bottle_on_ground.png'); // Lädt das Bild der Flasche
-        this.x = x;
-        this.y = y;
-        this.width = 80;
-        this.height = 80;
-        this.throw(); // Startet die Wurfbewegung
-    }
-    /**
-     * Methode zum Werfen des Objekts.
-     * Setzt die Anfangsgeschwindigkeiten und wendet Schwerkraft an.
-     */
-    throw() {
-        this.speedY = 35;
-        this.speedX = 0; 
-        this.applyGravity(); // Anwenden der Schwerkraft auf das Objekt
+  /**
+   * The number of bottles collected, relevant if managing inventory or similar mechanics.
+   * @type {number}
+   */
+  collectedBottles = 0;
 
-        setInterval(() => {
-            this.x += 10; // Bewegt das Objekt horizontal mit jedem Intervall (Erzeugt Wurfbewegung)
-        }, 25);
-    }
+  /**
+   * Constructs a new throwable object instance.
+   * @param {number} x - The initial x-coordinate where the object is created.
+   * @param {number} y - The initial y-coordinate where the object is created.
+   */
+  constructor(x, y) {
+    super(); // Call the parent class constructor.
+    // Load the image for the throwable object.
+    this.loadImage("../game/img/6_salsa_bottle/2_salsa_bottle_on_ground.png");
 
+    // Initialize position and size of the object.
+    this.x = x;
+    this.y = y;
+    this.width = 80;
+    this.height = 80;
+
+    // Execute throw behavior to launch the object.
+    this.throw();
+  }
+
+  /**
+   * Defines the throw behavior of the object, setting initial speeds and applying gravity.
+   */
+  throw() {
+    this.speedY = 35; // Set the initial vertical speed for the throw.
+    this.speedX = 0; // The horizontal speed can be adjusted here if needed.
+    this.applyGravity(); // Apply gravity to the object to make it fall.
+
+    // Set an interval to continuously update the object's horizontal position.
+    setInterval(() => {
+      this.x += 10; // Move the object horizontally.
+    }, 25);
+  }
 }
-

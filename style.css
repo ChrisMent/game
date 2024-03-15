@@ -3,6 +3,13 @@
   src: url("fonts/rio-grande/RioGrande.ttf") format("truetype");
 }
 
+body,
+html {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
 body {
   display: flex;
   flex-direction: column;
@@ -16,7 +23,7 @@ body {
   margin: 0;
   padding: 0;
   color: aliceblue;
-  overflow: hidden; /* Hide scrollbars */
+  overflow: hidden;
   font-family: "rio-grande", Helvetica, sans-serif;
 }
 
@@ -24,8 +31,7 @@ body {
   position: fixed;
   left: 0;
   top: 0;
-  width: 100%;
-  height: 100%;
+  z-index: 5;
   background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
@@ -38,56 +44,87 @@ body {
   border-radius: 5px;
   text-align: center;
   color: #000;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
 }
 
-h1 {
-  font-size: 78px;
+#modal-message {
+  padding: 60px;
+  font-size: 32px;
+}
+
+.headline {
+  font-size: 48px;
   letter-spacing: 6px;
   text-align: center;
-  margin-bottom: 80px;
+  z-index: 500;
 }
 
 .game-container {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 720px;
-  height: 480px;
-}
-
-.game-sizing {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20px; /* Optional: Abstand zwischen den Elementen */
 }
 
 canvas {
   background-color: #000;
-  display: block;
   border-radius: 40px;
   border: solid 8px #1d1c1c;
   box-sizing: border-box;
 }
 
-.button-area-top {
+canvas,
+.game-container {
+  width: 100vw;
+  height: 100vh;
+  max-height: 505px;
+  max-width: 740px;
+}
+
+.game-sizing {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transform-origin: top left;
+}
+
+.button-area-left {
+  position: absolute;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  justify-content: start;
   align-items: center;
-  margin: 20px;
-  flex-grow: 0;
-  flex-shrink: 0;
+  bottom: 100px;
+  margin-left: 15px;
 }
 
 .button-area-below {
-  display: flex;
-  justify-content: space-between;
+  position: absolute;
+  display: none;
+  justify-content: space-around;
   align-items: center;
   flex-grow: 0;
   flex-shrink: 0;
   width: 100%;
+  bottom: 22px;
+  left: 0;
+}
+
+.fullscreen-active {
+  width: 720px;
+  height: 480px;
+}
+
+.game-interaction {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background-color: #2b1800;
+  border: solid 2px #ffe5c4;
+  border-radius: 20px;
 }
 
 .buttons-left,
@@ -103,25 +140,8 @@ canvas {
   margin-right: 0;
 }
 
-.fullscreen-active .button-area-below {
-  position: absolute;
-  bottom: 480px;
-  left: 50%;
-  transform: translateX(-50%); /* Zentriert die button-area-below horizontal */
-  width: 720px; /* Breite entsprechend der ursprünglichen Größe des game-container */
-}
-
-.game-interaction {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  background-color: #2b1800;
-  border: solid 2px #ffe5c4;
-  border-radius: 20px;
-}
-
 .material-symbols-outlined {
-  font-size: 24px; /* Skaliert mit der Breite des Viewports */
+  font-size: 24px;
 }
 
 .button {
@@ -145,15 +165,12 @@ canvas {
   display: block;
   position: relative;
   padding: 1px 5px;
-
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   text-shadow: 0px 1px 0px #000;
   filter: dropshadow(color=#000, offx=0px, offy=1px);
-
   -webkit-box-shadow: inset 0 1px 0 #ffe5c4, 0 10px 0 #915100;
   -moz-box-shadow: inset 0 1px 0 #ffe5c4, 0 10px 0 #915100;
   box-shadow: inset 0 1px 0 #ffe5c4, 0 10px 0 #915100;
-
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 5px;
@@ -162,7 +179,6 @@ canvas {
 .button a:active {
   top: 10px;
   background-color: #f78900;
-
   -webkit-box-shadow: inset 0 1px 0 #ffe5c4, inset 0 -3px 0 #915100;
   -moz-box-shadow: inset 0 1px 0 #ffe5c4, inset 0 -3pxpx 0 #915100;
   box-shadow: inset 0 1px 0 #ffe5c4, inset 0 -3px 0 #915100;
@@ -185,8 +201,8 @@ canvas {
 
 .button-game-action {
   display: flex;
-  width: 36px; /* Feste Breite */
-  height: 36px; /* Feste Höhe */
+  width: 36px;
+  height: 36px;
   justify-content: center;
   align-items: center;
   appearance: button;
@@ -257,7 +273,7 @@ canvas {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(255, 255, 255, 1); /* Semi-transparenter Hintergrund */
+  background-color: rgba(255, 255, 255, 1);
   z-index: 2000;
   border: solid 8px #1d1c1c;
   box-sizing: border-box;
@@ -331,27 +347,40 @@ canvas {
 
 /* Responsive -------------- */
 
-@media only screen and (max-height: 480px) {
-  canvas,
-  .game-container {
-    height: 100vh; /* Volle Höhe des Viewports */
-    max-height: 480px; /* Maximale Höhe */
-  }
-}
-
-@media only screen and (max-width: 720px) {
-  canvas,
-  .game-container {
-    width: 100%; /* Volle Breite */
-    max-width: 720px; /* Maximale Breite */
-  }
-
+@media screen and (max-width: 1024px) {
   .headline {
     display: none;
   }
-  .button-area-below,
-  .button-area-top {
-    width: 100%; /* Anpassung der Breite der Button-Container */
-    padding: 0 10px; /* Optional: Padding für kleinere Bildschirme */
+
+  body {
+    background-image: none;
+  }
+
+  .button-area-below {
+    display: flex;
+  }
+
+  .container,
+  canvas {
+    height: 100vh;
+    max-width: 740px;
+  }
+}
+
+@media screen and (max-height: 780px) {
+  .headline {
+    display: none;
+  }
+}
+
+@media screen and (max-height: 540px) {
+  body {
+    background-image: none;
+  }
+}
+
+@media screen and (max-height: 400px) {
+  .button-area-left {
+    bottom: 70px;
   }
 }

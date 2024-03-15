@@ -1,33 +1,29 @@
 /**
- * Statischer Manager für Soundeffekte im Spiel.
- * Verwaltet eine zentrale Sammlung aller Soundeffekte und bietet Methoden zur Steuerung dieser Sounds.
- * 
- * @property {HTMLAudioElement[]} sounds - Ein statisches Array zur Speicherung aller Soundeffekte.
+ * Manages sound effects and music for the game.
+ * Allows for adding sounds to a centralized manager and muting or unmuting all sounds.
  */
 class SoundManager {
-    static sounds = [];
+  /**
+   * A static array holding all sounds added to the SoundManager.
+   * @type {HTMLAudioElement[]}
+   */
+  static sounds = [];
 
-    /**
-     * Fügt einen neuen Soundeffekt zum Sound-Manager hinzu.
-     * 
-     * @param {HTMLAudioElement} sound - Der hinzuzufügende Soundeffekt.
-     */
-    static addSound(sound) {
-        SoundManager.sounds.push(sound); // Fügt den Sound zum Array hinzu
-    }
+  /**
+   * Adds a sound to the SoundManager's sound array.
+   * @param {HTMLAudioElement} sound - The sound to add to the manager.
+   */
+  static addSound(sound) {
+    SoundManager.sounds.push(sound);
+  }
 
-    /**
-     * Schaltet die Stummschaltung aller Sounds im Sound-Manager um.
-     * 
-     * @param {boolean} isMuted - Gibt an, ob die Sounds stummgeschaltet werden sollen.
-     */
-    static toggleMute(isMuted) {
-        SoundManager.sounds.forEach(sound => {
-            sound.muted = isMuted; // Setzt die muted-Eigenschaft aller Sounds
-        });
-    }
+  /**
+   * Toggles the mute state for all managed sounds.
+   * @param {boolean} isMuted - Whether the sounds should be muted or not.
+   */
+  static toggleMute(isMuted) {
+    SoundManager.sounds.forEach((sound) => {
+      sound.muted = isMuted;
+    });
+  }
 }
-
-
-
-

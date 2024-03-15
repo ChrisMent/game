@@ -1,20 +1,20 @@
 /**
- * Klasse für den InfoScreen.
- * Verwaltet die Anzeige eines Informationsbildschirms im Spiel.
+ * Represents an information screen in the game.
  */
 class InfoScreen {
-    isVisible = false; // Sichtbarkeitsstatus des InfoScreens
+  /**
+   * Indicates whether the information screen is visible.
+   * @type {boolean}
+   */
+  isVisible = false;
 
-    /**
-     * Zeichnet den InfoScreen auf das Canvas.
-     * Wird nur gezeichnet, wenn `isVisible` auf true gesetzt ist.
-     * 
-     * @param {CanvasRenderingContext2D} ctx - Der 2D-Kontext des Canvas, auf dem der InfoScreen gezeichnet wird.
-     */
-    draw(ctx) {
-        if (this.isVisible) {
-            // Zeichnungslogik für den InfoScreen, wenn er sichtbar ist
-            // Hier können Sie beispielsweise Texte, Bilder oder Hintergründe zeichnen
-        }
+  /**
+   * Draws the information screen on the canvas context if it's visible.
+   * @param {CanvasRenderingContext2D} ctx - The canvas rendering context where the information screen should be drawn.
+   */
+  draw(ctx) {
+    if (this.isVisible) {
+      // Drawing logic would be placed here.
     }
+  }
 }

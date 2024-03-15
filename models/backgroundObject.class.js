@@ -1,24 +1,27 @@
 /**
- * Klasse, die ein Hintergrundbild repräsentiert. Erbt von MoveableObject.
- * 
- * @property {number} width - Breite des Hintergrundbildes.
- * @property {number} height - Höhe des Hintergrundbildes.
+ * Represents a background image in the game, extending MoveableObject to allow for potential movement (e.g., parallax effects).
  */
 class BackgroundImage extends MoveableObject {
-    width = 720;
-    height = 480;
+  /**
+   * The width of the background image.
+   * @type {number}
+   */
+  width = 720;
 
-    /**
-     * Konstruktor für die BackgroundImage-Klasse.
-     * Lädt ein Hintergrundbild und setzt dessen Position.
-     * 
-     * @param {string} imagePath - Pfad des Hintergrundbildes.
-     * @param {number} x - Horizontale Position des Hintergrundbildes.
-     */
-    constructor(imagePath, x) {
-        super().loadImage(imagePath);
-        this.x = x;
-        this.y = 480 - this.height;
-    }
+  /**
+   * The height of the background image.
+   * @type {number}
+   */
+  height = 480;
+
+  /**
+   * Creates an instance of a background image.
+   * @param {string} imagePath - The path to the image file.
+   * @param {number} x - The x-coordinate where the image should be placed.
+   */
+  constructor(imagePath, x) {
+    super().loadImage(imagePath);
+    this.x = x;
+    this.y = 480 - this.height;
+  }
 }
-
