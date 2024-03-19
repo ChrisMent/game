@@ -3,97 +3,21 @@
  * @extends MoveableObject
  */
 class Character extends MoveableObject {
-  /**
-   * The world object in which the character exists.
-   * @type {World}
-   */
   world;
-
-  /**
-   * The x-coordinate of the character.
-   * @type {number}
-   */
   x = 0;
-
-  /**
-   * The y-coordinate of the character.
-   * @type {number}
-   */
   y = 150;
-
-  /**
-   * The height of the character.
-   * @type {number}
-   */
   height = 280;
-
-  /**
-   * The width of the character.
-   * @type {number}
-   */
   width = 100;
-
-  /**
-   * The speed of the character.
-   * @type {number}
-   */
   speed = 4;
-
-  /**
-   * The last x-coordinate of the character.
-   * @type {number}
-   */
   lastX = 0;
-
-  /**
-   * The last action time of the character.
-   * @type {number}
-   */
   lastActionTime = 0;
-
-  /**
-   * The number of bottles collected by the character.
-   * @type {number}
-   */
   bottlesCollected = 0;
-
-  /**
-   * The number of coins collected by the character.
-   * @type {number}
-   */
   coinsCollected = 0;
-
-  /**
-   * The number of lives the character has.
-   * @type {number}
-   */
   lives = 6;
-
-  /**
-   * The last hit time of the character.
-   * @type {number}
-   */
   lastHit = 0;
-
-  /**
-   * Indicates if the character has just landed.
-   * @type {boolean}
-   */
   hasJustLanded = false;
-
-  /**
-   * Indicates if the character is in the air.
-   * @type {boolean}
-   */
   inAir = false;
-
-  /**
-   * The duration of invulnerability for the character.
-   * @type {number}
-   */
   invulnerabilityDuration = 1000;
-
-  // Arrays of image paths for character animations
 
   /**
    * Array of image paths for walking animation.

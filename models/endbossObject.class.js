@@ -16,9 +16,10 @@ class Endboss extends MoveableObject {
   isAlerting = true;
   alertAnimationFinished = false;
   alertAnimationCount = 0;
-  lives = 3;
+  lives = 6;
   isDead = false;
   animateInterval = null;
+
   IMAGES_ALERT = [
     "../game/img/4_enemie_boss_chicken/2_alert/G5.png",
     "../game/img/4_enemie_boss_chicken/2_alert/G6.png",
